@@ -1,3 +1,10 @@
+# common
 .idea
 __pycache__
 *.pyc
+# share
+backfile_10.03
+chaos_calmer-15.05
+*.tar.gz
+*.tar.bz2
+*.zip
