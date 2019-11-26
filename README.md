@@ -25,7 +25,7 @@ cd 10.03-openwrt350_nv2 && build.sh
 # ./remove.sh  # remove the docker daemon
 ```
 
-## machine supported
+## support list
 
 |openwrt|machine|status|vmlinux.elf|gdb working dir|
 |:---:|:---:|:---:|:--:|:--:|
