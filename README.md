@@ -1,8 +1,8 @@
 # openwrt-build-docker
 
-Docker files for OpenWRT 10.03, 15.05 building envs.
+Docker files for OpenWRT building envs.
 
-## dependency
+## acceleration
 
 Put them in `share`.
 
@@ -26,11 +26,11 @@ cd 10.03-openwrt350_nv2 && build.sh
 
 ## machine supported
 
-|openwrt|machine|
-|:---:|:---:|
-|10.03|openwrt350_nv2|
-|15.05|nas7820|
-|15.05|wrt320n_nv1|
+|openwrt|machine|status|vmlinux.elf|gdb working dir|
+|:---:|:---:|:---:|:--:|:--:|
+|10.03|openwrt350_nv2|Y|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/linux-orion_generic/vmlinux-debug-info.elf|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/linux-orion_generic/linux-2.6.32.10/|
+|15.05|nas7820|N|
+|15.05|wrt320n_nv1|N|
 
 
 
