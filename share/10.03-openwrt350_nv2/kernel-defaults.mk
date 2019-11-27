@@ -108,11 +108,11 @@ define Kernel/Configure/Default
 	$(SCRIPT_DIR)/metadata.pl kconfig $(TMP_DIR)/.packageinfo $(TOPDIR)/.config > $(LINUX_DIR)/.config.override
 	$(SCRIPT_DIR)/kconfig.pl 'm+' '+' $(LINUX_DIR)/.config.target /dev/null $(LINUX_DIR)/.config.override > $(LINUX_DIR)/.config
 #
-# self added, more config
+# START of self added, for more config
 #
 	cat $(TOPDIR)/kernel-config-extra >> $(LINUX_DIR)/.config
 #
-# self added, more config
+# END of self added
 #
 	$(call Kernel/SetInitramfs)
 	$(call Kernel/Configure/$(KERNEL))
@@ -132,12 +132,11 @@ define Kernel/CompileImage/Default
 	$(KERNEL_CROSS)objcopy -O binary $(OBJCOPY_STRIP) -S $(LINUX_DIR)/vmlinux $(LINUX_KERNEL)
 	$(KERNEL_CROSS)objcopy $(OBJCOPY_STRIP) -S $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux.elf
 #
-# self added, for generating kernel elf with debug info
+# START of self added, for generating kernel elf with debug info
+	cp $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux.elf-debug-info
 #
-	cp $(LINUX_DIR)/vmlinux $(LINUX_KERNEL)-ori
-	cp $(LINUX_DIR)/vmlinux $(LINUX_KERNEL)-debug-info-ori
-	$(KERNEL_CROSS)objcopy -O binary $(LINUX_DIR)/vmlinux $(LINUX_KERNEL)-debug-info
-	$(KERNEL_CROSS)objcopy $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux-debug-info.elf
+# END of self added
+#
 endef
 
 define Kernel/Clean/Default

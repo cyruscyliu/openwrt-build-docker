@@ -109,7 +109,13 @@ define Kernel/Configure/Default
 	echo "# CONFIG_KALLSYMS_UNCOMPRESSED is not set" >> $(LINUX_DIR)/.config.target
 	$(SCRIPT_DIR)/metadata.pl kconfig $(TMP_DIR)/.packageinfo $(TOPDIR)/.config $(KERNEL_PATCHVER) > $(LINUX_DIR)/.config.override
 	$(SCRIPT_DIR)/kconfig.pl 'm+' '+' $(LINUX_DIR)/.config.target /dev/null $(LINUX_DIR)/.config.override > $(LINUX_DIR)/.config
+#
+# START of self added, more config
+#
 	cat $(TOPDIR)/kernel-config-extra >> $(LINUX_DIR)/.config
+#
+# END of self added
+#
 	$(call Kernel/SetNoInitramfs)
 	rm -rf $(KERNEL_BUILD_DIR)/modules
 	$(_SINGLE) [ -d $(LINUX_DIR)/user_headers ] || $(MAKE) $(KERNEL_MAKEOPTS) INSTALL_HDR_PATH=$(LINUX_DIR)/user_headers headers_install
@@ -136,6 +142,13 @@ define Kernel/CopyImage
 	$(KERNEL_CROSS)objcopy -O binary $(OBJCOPY_STRIP) -S $(LINUX_DIR)/vmlinux $(LINUX_KERNEL)$(1)
 	$(KERNEL_CROSS)objcopy $(OBJCOPY_STRIP) -S $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux$(1).elf
 	$(CP) $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux.debug
+#
+# START of self added, backup debug-info
+#
+	$(CP) $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux.elf-debug-info
+#
+# END of self added
+#
 	$(foreach k, \
 		$(if $(KERNEL_IMAGES),$(KERNEL_IMAGES),$(filter-out dtbs,$(KERNELNAME))), \
 		$(CP) $(LINUX_DIR)/arch/$(LINUX_KARCH)/boot/$(IMAGES_DIR)/$(k) $(KERNEL_BUILD_DIR)/$(k)$(1); \
