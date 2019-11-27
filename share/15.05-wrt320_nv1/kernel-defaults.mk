@@ -110,11 +110,11 @@ define Kernel/Configure/Default
 	$(SCRIPT_DIR)/metadata.pl kconfig $(TMP_DIR)/.packageinfo $(TOPDIR)/.config $(KERNEL_PATCHVER) > $(LINUX_DIR)/.config.override
 	$(SCRIPT_DIR)/kconfig.pl 'm+' '+' $(LINUX_DIR)/.config.target /dev/null $(LINUX_DIR)/.config.override > $(LINUX_DIR)/.config
 #
-# self added, more config
+# START of self added, more config
 #
 	cat $(TOPDIR)/kernel-config-extra >> $(LINUX_DIR)/.config
 #
-# self added, more config
+# END of self added
 #
 	$(call Kernel/SetNoInitramfs)
 	rm -rf $(KERNEL_BUILD_DIR)/modules
@@ -143,11 +143,11 @@ define Kernel/CopyImage
 	$(KERNEL_CROSS)objcopy $(OBJCOPY_STRIP) -S $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux$(1).elf
 	$(CP) $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux.debug
 #
-# self added, more config
+# START of self added, backup debug-info 
 #
-	$(KERNEL_CROSS)objcopy -O binary $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux$(1).elf_no_strip
+	$(CP) $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux.elf-debug-info
 #
-# self added, more config
+# END of self added
 #
 	$(foreach k, \
 		$(if $(KERNEL_IMAGES),$(KERNEL_IMAGES),$(filter-out dtbs,$(KERNELNAME))), \
