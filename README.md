@@ -29,6 +29,6 @@ cd 10.03-openwrt350_nv2 && build.sh
 
 |openwrt|machine|status|vmlinux.elf|gdb working dir|
 |:---:|:---:|:---:|:--:|:--:|
-|10.03|openwrt350_nv2|Y|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/linux-orion_generic/vmlinux-debug-info.elf|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/linux-orion_generic/linux-2.6.32.10/|
-|15.05|nas7820|Y|share/15.05-nas7820/chaos_calmer-15.05/build_dir/target-arm_mpcore_uClibc-0.9.33.2_eabi/linux-oxnas/vmlinux.debug|share/15.05-nas7820/chaos_calmer-15.05/build_dir/target-arm_mpcore_uClibc-0.9.33.2_eabi/linux-oxnas/linux-3.18.20/|
-|15.05|wrt320n_nv1|Y|share/15.05-wrt320_nv1/chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/vmlinux.debug|share/15.05-wrt320_nv1/chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/linux-3.18.20/|
+|10.03|openwrt350_nv2|Y|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/linux-orion_generic/vmlinux.elf-debug-info|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/linux-orion_generic/linux-2.6.32.10/|
+|15.05|nas7820|Y|share/15.05-nas7820/chaos_calmer-15.05/build_dir/target-arm_mpcore_uClibc-0.9.33.2_eabi/linux-oxnas/vmlinux.elf-debug-info|share/15.05-nas7820/chaos_calmer-15.05/build_dir/target-arm_mpcore_uClibc-0.9.33.2_eabi/linux-oxnas/linux-3.18.20/|
+|15.05|wrt320n_nv1|Y|share/15.05-wrt320_nv1/chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/vmlinux.elf-debug-info|share/15.05-wrt320_nv1/chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/linux-3.18.20/|
