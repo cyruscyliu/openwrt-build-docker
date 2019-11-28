@@ -5,6 +5,8 @@ PACKAGE_DIR_NAME="backfire_10.03"
 
 export STORING_DIR=/root/firmware
 
+echo "openwrt" | sudo -S chown -R openwrt:openwrt $STORING_DIR
+
 cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd - || true
 rm -rf $PACKAGE_DIR_NAME && tar -jxvf $STORING_DIR/$PACKAGE_NAME
 
