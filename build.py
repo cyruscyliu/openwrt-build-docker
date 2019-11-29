@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-We are going to build machine in machines.csv.
+We are going to build machines in machines.csv.
 """
 import os
 import sys
@@ -27,7 +27,7 @@ def find_urls_in_openwrt_homepage(homepage):
 
 def build():
     header = None
-    # we found a .config always in the ImageBuilder
+    # we found a .config always in an ImageBuilder
     # we also found many firmware share the same ImageBuilder
     # because they are downloaded from the same page
     image_builder_table = {}
