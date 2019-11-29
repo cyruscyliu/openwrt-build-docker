@@ -4,7 +4,7 @@
 We are going to find
     1. source code
     2. vmlinux with debug info
-    by given openwrt revision and machine name.
+    by given firmware uuid.
 """
 import os
 import sys
