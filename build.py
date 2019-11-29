@@ -47,7 +47,7 @@ def build():
             else:
                 image_builder_table[hash(url_to_image_builder)] = {'url': url_to_image_builder, 'support': [uuid]}
     # save image_builder_table
-    with open('image_builder.txt', 'w') as f:
+    with open('image_builder.csv', 'w') as f:
         for k, v in image_builder_table.items():
             f.write('{},{},{}\n'.format(k, v['url'], ','.join(v['support'])))
     # download the image_builder to share
