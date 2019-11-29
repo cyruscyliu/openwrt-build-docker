@@ -11,7 +11,7 @@ import sys
 
 
 def get_openwrt_source_code(uuid):
-    with open('image_builder.txt') as f:
+    with open('image_builder.csv') as f:
         for line in f:
             items = line.strip().split(',')
             target_machine = {'hash': items[0], 'url': items[1], 'support': items[2:]}
@@ -19,7 +19,7 @@ def get_openwrt_source_code(uuid):
                 break
     hash_to_machine = str(target_machine['hash'])
     path_to_vmlinux, path_to_source_code = None, None
-    with open('support_list.txt') as f:
+    with open('support_list.csv') as f:
         for line in f:
             if line.startswith(hash_to_machine):
                 print(line)
