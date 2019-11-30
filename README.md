@@ -4,7 +4,7 @@
 
 Docker files for OpenWRT building envs.
 
-## install
+## dependency
 
 ```shell script
 add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt install -y python3.7 && \
