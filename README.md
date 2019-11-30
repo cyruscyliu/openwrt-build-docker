@@ -1,6 +1,20 @@
 # openwrt-build-docker
 
+
+
 Docker files for OpenWRT building envs.
+
+## dependency
+
+```shell script
+add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt install -y python3.7 && \
+    apt install -y python3-pip && python3.7 -m pip install --upgrade pip
+
+rm /usr/bin/python && ln -s /usr/bin/python3.7 /usr/bin/python && \
+    rm /usr/local/bin/pip && ln -s /usr/local/bin/pip3.7 /usr/local/bin/pip
+
+pip3.7 install pyquery
+```
 
 ## acceleration
 
@@ -30,7 +44,7 @@ cd 10.03-openwrt350_nv2 && build.sh
 
 |openwrt|machine|status|vmlinux.elf|gdb working dir|
 |:---:|:---:|:---:|:--:|:--:|
-|10.03|openwrt350_nv2|Y|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/linux-orion_generic/vmlinux.elf-debug-info|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/linux-orion_generic/linux-2.6.32.10/|
-|10.03|wr703n_v1|Y|share/12.09-wr703n-v1/archive-12.09/build_dir/linux-ar71xx_generic/vmlinux.elf-debug-info|share/12.09-wr703n-v1/archive-12.09/build_dir/linux-ar71xx_generic/linux-3.3.8/|
-|15.05|nas7820|Y|share/15.05-nas7820/chaos_calmer-15.05/build_dir/target-arm_mpcore_uClibc-0.9.33.2_eabi/linux-oxnas/vmlinux.elf-debug-info|share/15.05-nas7820/chaos_calmer-15.05/build_dir/target-arm_mpcore_uClibc-0.9.33.2_eabi/linux-oxnas/linux-3.18.20/|
-|15.05|wrt320n_nv1|Y|share/15.05-wrt320_nv1/chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/vmlinux.elf-debug-info|share/15.05-wrt320_nv1/chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/linux-3.18.20/|
+|10.03|openwrt350_nv2|Y|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/linux-orion_generic/vmlinux.elf-debug-info|share/10.03-openwrt350_nv2/backfire_10.03/build_dir/toolchain-arm_v5t_gcc-4.3.3+cs_uClibc-0.9.30.1_eabi/linux/|
+|12.09|wr703n_v1|Y|share/12.09-wr703n-v1/archive-12.09/build_dir/linux-ar71xx_generic/vmlinux.elf-debug-info|share/12.09-wr703n-v1/archive-12.09/build_dir/linux-ar71xx_generic/linux-3.3.8/|
+|15.05|nas7820|Y|share/15.05-nas7820/chaos_calmer-15.05/build_dir/target-arm_mpcore_uClibc-0.9.33.2_eabi/linux-oxnas/vmlinux.elf-debug-info|share/15.05-nas7820/chaos_calmer-15.05/build_dir/toolchain-arm_mpcore_gcc-4.8-linaro_uClibc-0.9.33.2_eabi/linux-3.18.20/|
+|15.05|wrt320n_nv1|Y|share/15.05-wrt320_nv1/chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/vmlinux.elf-debug-info|share/15.05-wrt320_nv1/chaos_calmer-15.05/build_dir/toolchain-mipsel_74kc+dsp2_gcc-4.8-linaro_uClibc-0.9.33.2/linux-3.18.20/|
