@@ -1,6 +1,20 @@
 # openwrt-build-docker
 
+
+
 Docker files for OpenWRT building envs.
+
+## install
+
+```shell script
+add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt install -y python3.7 && \
+    apt install -y python3-pip && python3.7 -m pip install --upgrade pip
+
+rm /usr/bin/python && ln -s /usr/bin/python3.7 /usr/bin/python && \
+    rm /usr/local/bin/pip && ln -s /usr/local/bin/pip3.7 /usr/local/bin/pip
+
+pip3.7 install pyquery
+```
 
 ## acceleration
 
