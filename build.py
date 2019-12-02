@@ -56,6 +56,13 @@ def build():
         with open('image_builder.csv', 'w') as f:
             for k, v in image_builder_table.items():
                 f.write('{},{},{}\n'.format(k, v['url'], ','.join(v['support'])))
+    else:
+        image_builder_table = {}
+        with open('image_builder.csv') as f:
+            for line in f:
+                items = line.strip().split(',')
+                image_builder_table[items[0]] = {'url':items[1], 'support':items[2:]}
+
     # download the image_builder to ./share
     for k, v in image_builder_table.items():
         os.system('wget -nc {} -P share'.format(v['url']))
