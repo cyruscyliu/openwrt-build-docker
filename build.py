@@ -67,7 +67,10 @@ def build():
     for k, v in image_builder_table.items():
         os.system('wget -nc {} -P share'.format(v['url']))
         # TODO
+        # extract .config from the image builder(tar.bz2)
         # get .config
+        image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '')
+        os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config'.format(image_builder_name))
         # build this machine
         # write to support list
 
