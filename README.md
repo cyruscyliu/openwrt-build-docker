@@ -6,14 +6,23 @@ Docker files for OpenWRT building envs.
 
 ## dependency
 
-```shell script
+1. Install `python3.7` if you don't have.
+```bash
 add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt install -y python3.7 && \
     apt install -y python3-pip && python3.7 -m pip install --upgrade pip
+```
 
-rm /usr/bin/python && ln -s /usr/bin/python3.7 /usr/bin/python && \
-    rm /usr/local/bin/pip && ln -s /usr/local/bin/pip3.7 /usr/local/bin/pip
+2. Install `virtualenv` if you don't have.
+```bash
+pip install virtualenv
+```
 
-pip3.7 install pyquery
+3. Install pyquery in virtual python environment.
+```bash
+mkdir -p ./pyenv
+virtualenv -p `which python3.7` ./pyenv
+source pyenv/bin/activate
+pip install pyquery
 ```
 
 ## acceleration
