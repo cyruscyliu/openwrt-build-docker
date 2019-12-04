@@ -4,6 +4,7 @@ We are going to build machines in machines.csv.
 """
 import os
 import sys
+import errno
 import hashlib
 from pyquery import PyQuery as pq
 
@@ -65,7 +66,7 @@ def build():
 
     #print(image_builder_table)
 
-    # in this loop, build the building directory for every firmware
+    # in this loop, prepare the building directory for every firmware
     for k, v in image_builder_table.items():
         # TODO: confirm the way to get version
         openwrtver = v['url'].split('/')[4]
@@ -74,8 +75,12 @@ def build():
 
         # 1. mkdir of this firmware (currently we use hash but each firmware a seperate building dir, we need to do this in the 1st round & then check which can be merged later)
         # name: openwrtversion-hash
-        one_building_dir = './share/%s-%s' % (openwrtver, hash)
-        os.mkdir(one_building_dir)
+        one_building_dir = '%s-%s' % (openwrtver, hash)
+        try:
+            os.mkdir("share/%s" % (one_building_dir))
+        except OSError as exp:
+            if exp.errno != errno.EEXIST:
+                raise
 
         # 2. download the image_builder to ./share
         os.system('wget -nc {} -P share'.format(v['url']))
@@ -85,11 +90,14 @@ def build():
         os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config && mv {0}/.config {1}/OpenWrt.config && rm -r {0}'.format(image_builder_name, one_building_dir))
 
         # 4. copy other things (patches to download.pl, makefiles, etc...)
-        os.system('cp share/%s/* %s' % (openwrtver, one_building_dir))
+        os.system('cp share/%s/* share/%s' % (openwrtver, one_building_dir))
 
-    # write all to support list
+    # 5. build the machine in the specified docker (maybe manually?)
 
-    # build this machine in the specified docker (maybe manually?)
+    # 6. write all to support list
+    # we need to locate the path:
+    # the easiest way is to search the vmlinux.elf first,
+    # then locate the linux source dir based on that
 
 
 if __name__ == '__main__':
