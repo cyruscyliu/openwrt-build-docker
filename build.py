@@ -63,15 +63,29 @@ def build():
                 items = line.strip().split(',')
                 image_builder_table[items[0]] = {'url':items[1], 'support':items[2:]}
 
+    #print(image_builder_table)
+
     # in this loop, build the building directory for every firmware
     for k, v in image_builder_table.items():
-        os.system('wget -nc {} -P share'.format(v['url']))
-        image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '')
-        os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config'.format(image_builder_name))
+        # TODO: confirm the way to get version
+        openwrtver = v['url'].split('/')[4]
+        supported_firmwares = "\n".join(v['support'])
+        hash = k
+
         # 1. mkdir of this firmware (currently we use hash but each firmware a seperate building dir, we need to do this in the 1st round & then check which can be merged later)
+        # name: openwrtversion-hash
+        one_building_dir = './share/%s-%s' % (openwrtver, hash)
+        os.mkdir(one_building_dir)
+
         # 2. download the image_builder to ./share
+        os.system('wget -nc {} -P share'.format(v['url']))
+
         # 3. extract .config from the image builder(tar.bz2) to the building dir
+        image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '')
+        os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config && mv {0}/.config {1}/OpenWrt.config && rm -r {0}'.format(image_builder_name, one_building_dir))
+
         # 4. copy other things (patches to download.pl, makefiles, etc...)
+        os.system('cp share/%s/* %s' % (openwrtver, one_building_dir))
 
     # write all to support list
 
