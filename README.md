@@ -1,7 +1,5 @@
 # openwrt-build-docker
 
-
-
 Docker files for OpenWRT building envs.
 
 ## dependency
@@ -14,7 +12,7 @@ add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt install -y python
 
 2. Install `virtualenv` if you don't have.
 ```bash
-pip install virtualenv
+pip3.7 install virtualenv
 ```
 
 3. Install pyquery in virtual python environment.
@@ -48,6 +46,12 @@ cd 10.03
 cd 10.03-openwrt350_nv2 && build.sh
 # ./remove.sh  # remove the docker daemon
 ```
+## automation
+
+Given the offical url where you download your firmware and a uuid for the firmware, we can generate the building files
+w.s.t to this firmware and find its vmlinux and source code directory automatically. See [build.py](./build.py) for details.
+
+Using the uuid you can get the path to its vmlinux and path to the source code, just type `search.py UUID`.
 
 ## support list
 

@@ -83,6 +83,7 @@ def build():
                 raise
 
         # 2. download the image_builder to ./share
+        print(v['url'])
         os.system('wget -nc {} -P share'.format(v['url']))
 
         # 3. extract .config from the image builder(tar.bz2) to the building dir
