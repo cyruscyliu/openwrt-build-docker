@@ -5,8 +5,6 @@ PACKAGE_DIR_NAME="archive-12.09"
 
 export STORING_DIR=/root/firmware
 
-echo "openwrt" | sudo -S chown -R openwrt:openwrt $STORING_DIR
-
 cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd - || true
 rm -rf $PACKAGE_DIR_NAME && tar -xf $STORING_DIR/$PACKAGE_NAME
 
@@ -25,5 +23,5 @@ tar -xf $STORING_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
 #http://mirror2.openwrt.org/sources/opkg-618.tar.gz
 #http://mirror2.openwrt.org/sources/hotplug2-201.tar.gz
 
-cd $PACKAGE_DIR_NAME 
+cd $PACKAGE_DIR_NAME
 make -j4
