@@ -51,7 +51,25 @@ cd 10.03-openwrt350_nv2 && build.sh
 Given the offical url where you download your firmware and a uuid for the firmware, we can generate the building files
 w.s.t to this firmware and find its vmlinux and source code directory automatically. See [build.py](./build.py) for details.
 
+```shell script
+./build
+# manully build
+./build -s # update support list
+```
+
 Using the uuid you can get the path to its vmlinux and path to the source code, just type `search.py UUID`.
+
+```shell script
+./search 14235
+14235   download from   http://archive.openwrt.org/chaos_calmer/15.05/brcm47xx/mips74k/openwrt-15.05-brcm47xx-mips74k-asus-rt-n10u-squashfs.trx
+14235   homepage is http://archive.openwrt.org/chaos_calmer/15.05/brcm47xx/mips74k
+14235   together with   []
+14235   build at    share/15.05-c771ee4bc428900c59114713e76e54f6
+14235   source code share/15.05-c771ee4bc428900c59114713e76e54f6/./chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/linux-3.18.20
+14235   vmlinux.elf share/15.05-c771ee4bc428900c59114713e76e54f6/./chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/linux-3.18.20/vmlinux
+14235   with symbol share/15.05-c771ee4bc428900c59114713e76e54f6/./chaos_calmer-15.05/bui  ld_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/vmlinux.elf-debug-info
+14235   and .config share/15.05-c771ee4bc428900c59114713e76e54f6/./chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/linux-3.18.20/.config
+```
 
 ## support list
 
