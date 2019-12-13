@@ -39,16 +39,18 @@ def search(uuid):
     print('{}\tbuild at\tshare/{}-{}'.format(uuid, openwrtver, hash_of_image_builder))
 
     # find path to vmlinux and path to source code
-    vmlinux_debug_info, source_code, vmlinux, dot_config = None, None, None, None
+    found = False
     with open('support_list.csv', 'r') as f:
         for line in f:
             h, vmlinux_debug_info, source_code, vmlinux, dot_config = line.strip().split(',')
             if h == hash_of_image_builder:
+                found = True
                 break
-    print('{}\tsource code\t{}'.format(uuid, source_code))
-    print('{}\tvmlinux.elf\t{}'.format(uuid, vmlinux))
-    print('{}\twith symbols\t{}'.format(uuid, vmlinux_debug_info))
-    print('{}\tand .config\t{}'.format(uuid, dot_config))
+    if found:
+        print('{}\tsource code\t{}'.format(uuid, source_code))
+        print('{}\tvmlinux.elf\t{}'.format(uuid, vmlinux))
+        print('{}\twith symbols\t{}'.format(uuid, vmlinux_debug_info))
+        print('{}\tand .config\t{}'.format(uuid, dot_config))
 
 
 if __name__ == '__main__':
