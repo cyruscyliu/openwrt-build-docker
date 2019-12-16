@@ -131,6 +131,7 @@ def build(search=False):
     # in this loop, prepare the building directory for every firmware
     for k, v in image_builder_table.items():
         # TODO: confirm the way to get version
+        print(v['url'])
         openwrtver = v['url'].split('/')[4]
         supported_firmwares = "\n".join(v['support'])
         hash = k
@@ -138,19 +139,25 @@ def build(search=False):
         # 1. mkdir of this firmware (currently we use hash but each firmware a seperate building dir, we need to do this in the 1st round & then check which can be merged later)
         # name: openwrtversion-hash
         one_building_dir = '%s-%s' % (openwrtver, hash)
+
+        image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '')
+        config = os.path.join('share', image_builder_name, '.config')
+        fast = os.path.exists(config)
+
         try:
-            os.mkdir("share/%s" % (one_building_dir))
+            if not fast:
+                os.mkdir("share/%s" % (one_building_dir))
         except OSError as exp:
             if exp.errno != errno.EEXIST:
                 raise
 
         # 2. download the image_builder to ./share
-        print(v['url'])
-        os.system('wget -nc {} -P share'.format(v['url']))
+        if not fast:
+            os.system('wget -nc {} -P share'.format(v['url']))
 
-        # 3. extract .config from the image builder(tar.bz2) to the building dir
-        image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '')
-        os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config && mv {0}/.config {1}/OpenWrt.config && rm -r {0}'.format(image_builder_name, one_building_dir))
+            # 3. extract .config from the image builder(tar.bz2) to the building dir
+            image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '')
+            os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config >/dev/null 2>&1 && cp {0}/.config {1}/OpenWrt.config'.format(image_builder_name, one_building_dir))
 
         # 4. copy other things (patches to download.pl, makefiles, etc...)
         os.system('cp share/%s/* share/%s' % (openwrtver, one_building_dir))
