@@ -4,6 +4,12 @@ Docker files for OpenWRT building envs.
 
 ## dependency
 
+0. Install `docker` if you don't have.
+```bash
+apt-get install -y docker.io && pip install docker-compose==1.19.0 && \
+    ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+```
+
 1. Install `python3.7` if you don't have.
 ```bash
 add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt install -y python3.7 && \
