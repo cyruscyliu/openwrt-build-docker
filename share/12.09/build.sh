@@ -4,6 +4,7 @@ PACKAGE_NAME="v12.09.tar.gz"
 PACKAGE_DIR_NAME="archive-12.09"
 
 export STORING_DIR=/root/firmware
+echo "openwrt" | sudo -S chown -R openwrt:openwrt $STORING_DIR
 
 cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd - || true
 rm -rf $PACKAGE_DIR_NAME && tar -xf $STORING_DIR/$PACKAGE_NAME
