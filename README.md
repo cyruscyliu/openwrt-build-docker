@@ -80,3 +80,10 @@ Using the uuid you can get the path to its vmlinux and path to the source code, 
 ## support list
 
 [support_list.csv](./support_list.csv)
+
+## stats
+||10.03|12.09|15.05|sum|
+|:---:|:---:|:---:|:---:|:---:|
+|firmware we have|16|22|37|75|
+|distinct homepage|7|6|9|22|
+|souce code we support|7||9|16|
