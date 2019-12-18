@@ -86,7 +86,7 @@ Using the uuid you can get the path to its vmlinux and path to the source code, 
 |:---:|:---:|:---:|:---:|:---:|
 |firmware we have|16|22|37|75|
 |distinct homepage|7|6|9|22|
-|souce code we support|7||9|16|
+|souce code we support|7|4|9|20|
 
 ## problems in manully building
 
