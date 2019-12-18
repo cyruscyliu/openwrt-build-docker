@@ -87,3 +87,8 @@ Using the uuid you can get the path to its vmlinux and path to the source code, 
 |firmware we have|16|22|37|75|
 |distinct homepage|7|6|9|22|
 |souce code we support|7||9|16|
+
+## problems in manully building
+
++ set KGDB_XXX flags =n
++ [vmlinux-all0239-3g.bin.lzma.combined: No such file or directory](https://forum.archive.openwrt.org/viewtopic.php?id=41831)
