@@ -18,7 +18,7 @@ add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt install -y python
 
 2. Install `virtualenv` if you don't have.
 ```bash
-pip3.7 install virtualenv
+pip install virtualenv
 ```
 
 3. Install pyquery in virtual python environment.
