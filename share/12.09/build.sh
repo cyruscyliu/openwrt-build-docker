@@ -4,9 +4,9 @@ PACKAGE_NAME="v12.09.tar.gz"
 PACKAGE_DIR_NAME="archive-12.09"
 
 export STORING_DIR=/root/firmware
-echo "openwrt" | sudo -S chown openwrt:openwrt $STORING_DIR
+echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
-cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd - || true
+cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- || true
 rm -rf $PACKAGE_DIR_NAME && tar -xf $STORING_DIR/$PACKAGE_NAME
 
 # patch and config
@@ -25,4 +25,4 @@ tar -xf $STORING_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
 #http://mirror2.openwrt.org/sources/hotplug2-201.tar.gz
 
 cd $PACKAGE_DIR_NAME
-make -j4
+make -j16 >buildout.txt 2>&1

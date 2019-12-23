@@ -4,10 +4,10 @@ PACKAGE_NAME="v15.05.zip"
 PACKAGE_DIR_NAME="chaos_calmer-15.05"
 
 export STORING_DIR=/root/firmware
-echo "openwrt" | sudo -S chown openwrt:openwrt $STORING_DIR
+echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
-cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd - || true
-rm -rf $PACKAGE_DIR_NAME && unzip $STORING_DIR/$PACKAGE_NAME
+cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- || true
+rm -rf $PACKAGE_DIR_NAME && unzip $STORING_DIR/$PACKAGE_NAME >/dev/null 2>&1
 
 # patch and config
 target=$PACKAGE_DIR_NAME
@@ -15,7 +15,7 @@ cp "OpenWrt.config" "$target/.config"
 cp "kernel-defaults.mk" "$target/include/kernel-defaults.mk"
 cp "kernel-config-extra" "$target/kernel-config-extra"
 
-tar -xzvf $STORING_DIR/15.05.dl.tar.gz -C $PACKAGE_DIR_NAME
+tar -xzf $STORING_DIR/15.05.dl.tar.gz -C $PACKAGE_DIR_NAME
 
 cd $PACKAGE_DIR_NAME || true
-make -j4
+make -j16 >buildout.txt 2>&1
