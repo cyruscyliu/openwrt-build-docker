@@ -7,7 +7,6 @@
 
 KERNEL_MAKEOPTS := -C $(LINUX_DIR) \
 	HOSTCFLAGS="$(HOST_CFLAGS) -Wall -Wmissing-prototypes -Wstrict-prototypes" \
-	EXTRA_CFLAGS="-save-temps=obj" \
 	CROSS_COMPILE="$(KERNEL_CROSS)" \
 	ARCH="$(LINUX_KARCH)" \
 	KBUILD_HAVE_NLS=no \
@@ -158,7 +157,7 @@ endef
 
 define Kernel/CompileImage/Default
 	rm -f $(TARGET_DIR)/init
-	+$(MAKE) $(KERNEL_MAKEOPTS) $(if $(KERNELNAME),$(KERNELNAME),all) modules
+	+$(MAKE) $(KERNEL_MAKEOPTS) $(if $(KERNELNAME),$(KERNELNAME),all) modules V=1 >$(KERNEL_BUILD_DIR)/makeout.txt 2>&1
 	$(call Kernel/CopyImage)
 endef
 
