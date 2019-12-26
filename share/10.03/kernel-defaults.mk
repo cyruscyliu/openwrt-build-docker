@@ -18,7 +18,6 @@ endif
 
 KERNEL_MAKEOPTS := -C $(LINUX_DIR) \
 	CROSS_COMPILE="$(KERNEL_CROSS)" \
-	EXTRA_CFLAGS="-save-temps=obj" \
 	ARCH="$(LINUX_KARCH)" \
 	KBUILD_HAVE_NLS=no \
 	CONFIG_SHELL="$(BASH)"
@@ -129,7 +128,7 @@ OBJCOPY_STRIP = -R .reginfo -R .notes -R .note -R .comment -R .mdebug -R .note.g
 
 define Kernel/CompileImage/Default
 	$(if $(CONFIG_TARGET_ROOTFS_INITRAMFS),,rm -f $(TARGET_DIR)/init)
-	+$(MAKE) $(KERNEL_MAKEOPTS) $(KERNELNAME)
+	+$(MAKE) $(KERNEL_MAKEOPTS) $(KERNELNAME) V=1 >$(KERNEL_BUILD_DIR)/makeout.txt 2>&1
 	$(KERNEL_CROSS)objcopy -O binary $(OBJCOPY_STRIP) -S $(LINUX_DIR)/vmlinux $(LINUX_KERNEL)
 	$(KERNEL_CROSS)objcopy $(OBJCOPY_STRIP) -S $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux.elf
 #

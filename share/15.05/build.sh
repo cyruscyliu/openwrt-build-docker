@@ -18,4 +18,4 @@ cp "kernel-config-extra" "$target/kernel-config-extra"
 tar -xzf $STORING_DIR/15.05.dl.tar.gz -C $PACKAGE_DIR_NAME
 
 cd $PACKAGE_DIR_NAME || true
-make -j16 >buildout.txt 2>&1
+make -j16 V=s >buildout.txt 2>&1

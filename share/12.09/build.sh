@@ -25,4 +25,4 @@ tar -xf $STORING_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
 #http://mirror2.openwrt.org/sources/hotplug2-201.tar.gz
 
 cd $PACKAGE_DIR_NAME
-make -j16 >buildout.txt 2>&1
+make -j16 V=s >buildout.txt 2>&1
