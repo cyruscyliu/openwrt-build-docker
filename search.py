@@ -2,6 +2,7 @@
 import os
 import sys
 
+
 def search(uuid):
     # maybe we don't support this firmware
     uuids = {}
@@ -12,7 +13,6 @@ def search(uuid):
     if uuid not in uuids:
         print('add this new firmware to machines.csv')
         exit(-1)
-
 
     # find its hash
     hash_of_image_builder, candidates = None, None
@@ -42,7 +42,7 @@ def search(uuid):
     found = False
     with open('support_list.csv', 'r') as f:
         for line in f:
-            h, vmlinux_debug_info, source_code, vmlinux, dot_config = line.strip().split(',')
+            h, vmlinux_debug_info, source_code, vmlinux, dot_config, makeout = line.strip().split(',')
             if h == hash_of_image_builder:
                 found = True
                 break
@@ -51,6 +51,7 @@ def search(uuid):
         print('{}\tvmlinux.elf\t{}'.format(uuid, vmlinux))
         print('{}\twith symbols\t{}'.format(uuid, vmlinux_debug_info))
         print('{}\tand .config\t{}'.format(uuid, dot_config))
+        print('{}\tand makeout.txt\t{}'.format(uuid, makeout))
 
 
 if __name__ == '__main__':
