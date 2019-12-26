@@ -2,6 +2,9 @@
 
 Docker files for OpenWRT building envs.
 
++ if you are using [llbic](https://github.com/cyruscyliu/llbic), the volume option should be 
+`-v path/to/openwrt-build-docker/share:/root/firmware`
+
 ## dependency
 
 0. Install `docker` if you don't have.
