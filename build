@@ -98,7 +98,7 @@ def build(search=False):
                         os.path.join(full_path, os.path.join(os.path.dirname(path.strip()), '.config'))
             # makeout
             if len(makeout):
-                support_list[hash_of_image_builder]['path_to_makeout'] = os.path.join(full_path, makeout[0])
+                support_list[hash_of_image_builder]['path_to_makeout'] = os.path.join(full_path, makeout[0].strip())
             else:
                 support_list[hash_of_image_builder]['path_to_makeout'] = ''
 
