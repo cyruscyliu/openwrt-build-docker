@@ -69,15 +69,16 @@ w.s.t to this firmware and find its vmlinux and source code directory automatica
 Using the uuid you can get the path to its vmlinux and path to the source code, just type `search.py UUID`.
 
 ```shell script
-./search 14235
-14235   download from   http://archive.openwrt.org/chaos_calmer/15.05/brcm47xx/mips74k/openwrt-15.05-brcm47xx-mips74k-asus-rt-n10u-squashfs.trx
-14235   homepage is http://archive.openwrt.org/chaos_calmer/15.05/brcm47xx/mips74k
-14235   together with   []
-14235   build at    share/15.05-c771ee4bc428900c59114713e76e54f6
-14235   source code share/15.05-c771ee4bc428900c59114713e76e54f6/./chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/linux-3.18.20
-14235   vmlinux.elf share/15.05-c771ee4bc428900c59114713e76e54f6/./chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/linux-3.18.20/vmlinux
-14235   with symbol share/15.05-c771ee4bc428900c59114713e76e54f6/./chaos_calmer-15.05/bui  ld_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/vmlinux.elf-debug-info
-14235   and .config share/15.05-c771ee4bc428900c59114713e76e54f6/./chaos_calmer-15.05/build_dir/target-mipsel_74kc+dsp2_uClibc-0.9.33.2/linux-brcm47xx_mips74k/linux-3.18.20/.config
+./search 15007
+15007	download from	http://archive.openwrt.org/backfire/10.03/orion/openwrt-wrt350nv2-squashfs-recovery.bin
+15007	homepage is	http://archive.openwrt.org/backfire/10.03/orion
+15007	together with	[]
+15007	build at	share/10.03-0432e31f4e2b38424921fa78247f6b27
+15007	source code	share/10.03-0432e31f4e2b38424921fa78247f6b27/./backfire_10.03/build_dir/linux-orion_generic/linux-2.6.32.10-pure
+15007	vmlinux.elf	share/10.03-0432e31f4e2b38424921fa78247f6b27/./backfire_10.03/build_dir/linux-orion_generic/linux-2.6.32.10-pure/vmlinux
+15007	with symbols	share/10.03-0432e31f4e2b38424921fa78247f6b27/./backfire_10.03/build_dir/linux-orion_generic/vmlinux.elf-debug-info
+15007	and .config	share/10.03-0432e31f4e2b38424921fa78247f6b27/./backfire_10.03/build_dir/linux-orion_generic/linux-2.6.32.10-pure/.config
+15007	and makeout.txt	share/10.03-0432e31f4e2b38424921fa78247f6b27/./backfire_10.03/build_dir/linux-orion_generic/linux-2.6.32.10/makeout.txt
 ```
 
 ## support list
