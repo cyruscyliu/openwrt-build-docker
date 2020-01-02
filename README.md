@@ -76,7 +76,7 @@ exit
 ## query
 
 Using the uuid you can get the path to its vmlinux and path to the source code, just type `search.py UUID`.
-All information is in `support_list.esv`, so use this file as an interface rather than what listed below.
+All information is in `support_list.esv`, so use this file and what listed below as interfaces.
 
 ```shell script
 14883	download from	http://archive.openwrt.org/chaos_calmer/15.05/ar71xx/generic/openwrt-15.05-ar71xx-generic-ubnt-rs-squashfs-sysupgrade.bin
