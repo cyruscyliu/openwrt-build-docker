@@ -46,12 +46,20 @@ def search(uuid):
             if h == hash_of_image_builder:
                 found = True
                 break
+
+    binary = os.path.basename(url)
+    build_at = 'share/{}-{}'.format(openwrtver, hash_of_image_builder)
+    binary_results = os.popen('cd {} && find -name {}'.format(build_at, binary)).readlines()
+        
     if found:
         print('{}\tsource code\t{}'.format(uuid, source_code))
         print('{}\tvmlinux.elf\t{}'.format(uuid, vmlinux))
         print('{}\twith symbols\t{}'.format(uuid, vmlinux_debug_info))
         print('{}\tand .config\t{}'.format(uuid, dot_config))
         print('{}\tand makeout.txt\t{}'.format(uuid, makeout))
+
+    if len(binary_results):
+        print('{}\tfirmware\t{}'.format(uuid, os.path.join(build_at, binary_results[0].strip())))
 
 
 if __name__ == '__main__':
