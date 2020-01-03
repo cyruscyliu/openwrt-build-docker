@@ -70,9 +70,12 @@ def search(uuid, summary=False):
 
     binary = os.path.basename(url)
     binary_results = os.popen('cd {} && find -name {}'.format(build_at, binary)).readlines()
+    gcc_results = os.popen('cd {} && find -name *-openwrt-linux-gcc'.format(build_at)).readlines()
     # summary !5, 10, 11
+    
 
     if found:
+
         if summary:
             info.append(source_code)
             info.append(vmlinux)
@@ -94,6 +97,13 @@ def search(uuid, summary=False):
             else:
                 print('{}\tfirmware\t{}'.format(uuid, path_to_binary))
         # summary 5, 10, !11
+            if len(gcc_results):
+                path_to_gcc = os.path.join(build_at, gcc_results[0].strip())
+                if summary:
+                    info.append(path_to_gcc)
+                else:
+                    print('{}\tgcc\t{}'.format(uuid, path_to_gcc))
+	    # summary 5, 10, 11, !12
 
     if summary:
         with open('summary/{}.summary'.format(uuid), 'w') as f:
