@@ -75,10 +75,11 @@ exit
 
 ## query
 
-Using the uuid you can get the path to its vmlinux and path to the source code, just type `search.py UUID`.
-Firmware sensitive information is not in `support_list.esv`, so use both `support_list.esv` and what listed below as interfaces.
+Using the uuid you can get the path to its vmlinux and path to the source code, just type `search UUID`.
+Firmware sensitive information is not in `support_list.esv`, so use `search -s UUID` to generate a summary as interface.
 
 ```shell script
+# search 14883
 14883	download from	http://archive.openwrt.org/chaos_calmer/15.05/ar71xx/generic/openwrt-15.05-ar71xx-generic-ubnt-rs-squashfs-sysupgrade.bin
 14883	homepage is	http://archive.openwrt.org/chaos_calmer/15.05/ar71xx/generic
 14883	together with	['14550', '14759', '14567', '14545', '14744', '14591', '14693', '14745', '14855', '14848', '14764', '14876', '14867']
@@ -90,6 +91,8 @@ Firmware sensitive information is not in `support_list.esv`, so use both `suppor
 14883	and makeout.txt	
 14883	firmware	share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/bin/ar71xx/openwrt-15.05-ar71xx-generic-ubnt-rs-squashfs-sysupgrade.bin
 ```
+
+------
 
 ## flow
 
