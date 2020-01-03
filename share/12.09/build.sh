@@ -15,6 +15,8 @@ cp download.pl $target/scripts/download.pl
 cp OpenWrt.config $target/.config
 cp kernel-defaults.mk $target/include/kernel-defaults.mk
 cp kernel-config-extra $target/kernel-config-extra
+cp generic.mk $target/target/linux/orion/image/generic.mk
+cp Makefile $target/target/linux/ramips/image/Makefile
 
 # feed dependency
 tar -xf $STORING_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
