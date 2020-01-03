@@ -3,7 +3,9 @@ import os
 import sys
 
 
-def search(uuid):
+def search(uuid, summary=False):
+    info = []
+
     # maybe we don't support this firmware
     uuids = {}
     with open('machines.csv') as f:
@@ -13,14 +15,24 @@ def search(uuid):
     if uuid not in uuids:
         print('add this new firmware to machines.csv')
         exit(-1)
+    if summary:
+        info.append(uuid)
 
     # find its hash
     hash_of_image_builder, candidates = None, None
     url = uuids[uuid]
-    print('{}\tdownload from\t{}'.format(uuid, url))
+    if summary:
+        info.append(url)
+    else:
+        print('{}\tdownload from\t{}'.format(uuid, url))
+
     openwrtver = url.split('/')[4]
     homepage = os.path.dirname(url)
-    print('{}\thomepage is\t{}'.format(uuid, homepage))
+    if summary:
+        info.append(homepage)
+    else:
+        print('{}\thomepage is\t{}'.format(uuid, homepage))
+
     with open('image_builder.csv') as f:
         for line in f:
             items = line.strip().split(',')
@@ -31,12 +43,21 @@ def search(uuid):
             if hp == homepage:
                 break
     candidates.remove(uuid)
-    print('{}\ttogether with\t{}'.format(uuid, candidates))
+    if summary:
+        info.append('@'.join(candidates))
+    else:
+        print('{}\ttogether with\t{}'.format(uuid, candidates))
+
     if hash_of_image_builder is None:
         print('add this new firmware to machines.csv')
         exit(-1)
 
-    print('{}\tbuild at\tshare/{}-{}'.format(uuid, openwrtver, hash_of_image_builder))
+    build_at = "share/{}-{}".format(openwrtver, hash_of_image_builder)
+
+    if summary:
+        info.append(build_at)
+    else:
+        print('{}\tbuild at\t{}'.format(uuid, build_at))
 
     # find path to vmlinux and path to source code
     found = False
@@ -48,22 +69,47 @@ def search(uuid):
                 break
 
     binary = os.path.basename(url)
-    build_at = 'share/{}-{}'.format(openwrtver, hash_of_image_builder)
     binary_results = os.popen('cd {} && find -name {}'.format(build_at, binary)).readlines()
         
     if found:
-        print('{}\tsource code\t{}'.format(uuid, source_code))
-        print('{}\tvmlinux.elf\t{}'.format(uuid, vmlinux))
-        print('{}\twith symbols\t{}'.format(uuid, vmlinux_debug_info))
-        print('{}\tand .config\t{}'.format(uuid, dot_config))
-        print('{}\tand makeout.txt\t{}'.format(uuid, makeout))
+        if summary:
+            info.append(source_code)
+            info.append(vmlinux)
+            info.append(vmlinux_debug_info)
+            info.append(dot_config)
+            info.append(makeout)
+        else:
+            print('{}\tsource code\t{}'.format(uuid, source_code))
+            print('{}\tvmlinux.elf\t{}'.format(uuid, vmlinux))
+            print('{}\twith symbols\t{}'.format(uuid, vmlinux_debug_info))
+            print('{}\tand .config\t{}'.format(uuid, dot_config))
+            print('{}\tand makeout.txt\t{}'.format(uuid, makeout))
 
     if len(binary_results):
-        print('{}\tfirmware\t{}'.format(uuid, os.path.join(build_at, binary_results[0].strip())))
+        path_to_binary = os.path.join(build_at, binary_results[0].strip())
+        if summary:
+            info.append(path_to_binary)
+        else:
+            print('{}\tfirmware\t{}'.format(uuid, path_to_binary))
+    if summary:
+        with open('summary/{}.summary'.format(uuid), 'w') as f:
+            f.write(','.join(info))
+        print('summary at summary/{}.summary'.format(uuid))
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('usage {} UUID'.format(sys.argv[0]))
+    summary = False 
+
+    if len(sys.argv) == 2:
+        uuid = sys.argv[1]
+    elif len(sys.argv) == 3:
+        if sys.argv[1] != '-s':
+            print('usage {} [-s] UUID'.format(sys.argv[0]))
+            exit(-1)
+        summary = True
+        uuid = sys.argv[2]
+    else:
+        print('usage {} [-s] UUID'.format(sys.argv[0]))
         exit(-1)
-    search(sys.argv[1])
+
+    search(uuid, summary=summary)
