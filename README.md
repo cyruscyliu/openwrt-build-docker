@@ -92,9 +92,12 @@ Firmware sensitive information is not in `support_list.esv`, so use `search -s U
 14883	firmware	share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/bin/ar71xx/openwrt-15.05-ar71xx-generic-ubnt-rs-squashfs-sysupgrade.bin
 ```
 
-------
+## license
+[MIT](./LICENSE)
 
-## flow
+## appendix
+
+### flow
 
 Take OpenWRT 10.03 as an example. Suppose you are building a firmware of OpenWRT 10.03.
 You are firstly expected to enter the OpenWRT 10.03 docker environment. 
@@ -117,7 +120,7 @@ cd 10.03 && ./build.sh # build the docker image locally
 exit && ./remove.sh  # exit and remove the docker daemon
 ```
 
-## dependency
+### dependency
 
 0. Install `docker` if you don't have.
 ```bash
@@ -144,7 +147,7 @@ source pyenv/bin/activate
 pip install pyquery
 ```
 
-## acceleration
+### acceleration
 
 Put them in `share` folder.
 
