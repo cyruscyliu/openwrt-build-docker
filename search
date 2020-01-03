@@ -70,7 +70,8 @@ def search(uuid, summary=False):
 
     binary = os.path.basename(url)
     binary_results = os.popen('cd {} && find -name {}'.format(build_at, binary)).readlines()
-        
+    # summary !5, 10, 11
+
     if found:
         if summary:
             info.append(source_code)
@@ -84,13 +85,16 @@ def search(uuid, summary=False):
             print('{}\twith symbols\t{}'.format(uuid, vmlinux_debug_info))
             print('{}\tand .config\t{}'.format(uuid, dot_config))
             print('{}\tand makeout.txt\t{}'.format(uuid, makeout))
+        # summary 5, !10, 11
 
-    if len(binary_results):
-        path_to_binary = os.path.join(build_at, binary_results[0].strip())
-        if summary:
-            info.append(path_to_binary)
-        else:
-            print('{}\tfirmware\t{}'.format(uuid, path_to_binary))
+        if len(binary_results):
+            path_to_binary = os.path.join(build_at, binary_results[0].strip())
+            if summary:
+                info.append(path_to_binary)
+            else:
+                print('{}\tfirmware\t{}'.format(uuid, path_to_binary))
+        # summary 5, 10, !11
+
     if summary:
         with open('summary/{}.summary'.format(uuid), 'w') as f:
             f.write(','.join(info))
