@@ -14,6 +14,7 @@ target=$PACKAGE_DIR_NAME
 cp "OpenWrt.config" "$target/.config"
 cp "kernel-defaults.mk" "$target/include/kernel-defaults.mk"
 cp "kernel-config-extra" "$target/kernel-config-extra"
+cp "Makefile" "$target/target/linux/ar71xx/image/Makefile"
 
 tar -xzf $STORING_DIR/15.05.dl.tar.gz -C $PACKAGE_DIR_NAME
 
