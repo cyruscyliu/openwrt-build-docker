@@ -90,19 +90,19 @@ def search(uuid, summary=False):
             print('{}\tand makeout.txt\t{}'.format(uuid, makeout))
         # summary 5, !10, 11
 
-        if len(binary_results):
-            path_to_binary = os.path.join(build_at, binary_results[0].strip())
+        if len(gcc_results):
+            path_to_gcc = os.path.join(build_at, gcc_results[0].strip())
             if summary:
-                info.append(path_to_binary)
+                info.append(path_to_gcc)
             else:
-                print('{}\tfirmware\t{}'.format(uuid, path_to_binary))
+                print('{}\tgcc\t{}'.format(uuid, path_to_gcc))
         # summary 5, 10, !11
-            if len(gcc_results):
-                path_to_gcc = os.path.join(build_at, gcc_results[0].strip())
+            if len(binary_results):
+                path_to_binary = os.path.join(build_at, binary_results[0].strip())
                 if summary:
-                    info.append(path_to_gcc)
+                    info.append(path_to_binary)
                 else:
-                    print('{}\tgcc\t{}'.format(uuid, path_to_gcc))
+                    print('{}\tfirmware\t{}'.format(uuid, path_to_binary))
 	    # summary 5, 10, 11, !12
 
     if summary:
