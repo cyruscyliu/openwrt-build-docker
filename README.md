@@ -7,8 +7,6 @@ Docker files for OpenWRT building envs refer to [firmware-uuid](https://github.c
 
 ## statistics
 
-[support_list.csv](./support_list.csv)
-
 ||10.03|12.09|15.05|sum|
 |:---:|:---:|:---:|:---:|:---:|
 |firmware we have|16|22|37|75|
@@ -17,8 +15,9 @@ Docker files for OpenWRT building envs refer to [firmware-uuid](https://github.c
 
 ## automation
 
-Given the offical url where you download your firmware and a uuid for the firmware, we can generate the building files
-w.s.t to this firmware and find its vmlinux and source code directory automatically. See [build](./build.py) for details.
+Using [firmware-uuid](https://github.com/cyruscyliu/firmware-uuid), we known the uuid for a firmware and the url 
+where you can download it. We can generate the building files w.s.t to this firmware and find its vmlinux and
+source code directory automatically. See [build](./build.py) for details.
 
 + suppose I download the firmware http://archive.openwrt.org/chaos_calmer/15.05/ar71xx/generic/openwrt-15.05-ar71xx-generic-ubnt-rs-squashfs-sysupgrade.bin and assign it a uuid 14883
 ```
@@ -67,32 +66,16 @@ cd 15.05-cc3a47a374475253f93a08eea6eaadce && ./build.sh
 exit
 ```
 
-+ at last, update `support_list.esv`
++ at last, summary all we have done
 ```
 ./build -s
 ```
 
-## query
-
-Using the uuid you can get the path to its vmlinux and path to the source code, just type `search UUID`.
-Firmware sensitive information is not in `support_list.esv`, so use `search -s UUID` to generate a summary as interface.
-
-```shell script
-# search 14883
-14883	download from	http://archive.openwrt.org/chaos_calmer/15.05/ar71xx/generic/openwrt-15.05-ar71xx-generic-ubnt-rs-squashfs-sysupgrade.bin
-14883	homepage is	http://archive.openwrt.org/chaos_calmer/15.05/ar71xx/generic
-14883	together with	['14550', '14759', '14567', '14545', '14744', '14591', '14693', '14745', '14855', '14848', '14764', '14876', '14867']
-14883	build at	share/15.05-cc3a47a374475253f93a08eea6eaadce
-14883	source code	share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.18.20
-14883	vmlinux.elf	share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.18.20/vmlinux
-14883	with symbols	share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/vmlinux.elf-debug-info
-14883	and .config	share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.18.20/.config
-14883	and makeout.txt	share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/makeout.txt
-14883	gcc	share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/OpenWrt-SDK-15.05-ar71xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/bin/mips-openwrt-linux-gcc
-14883	firmware	share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/bin/ar71xx/openwrt-15.05-ar71xx-generic-ubnt-rs-squashfs-sysupgrade.bin
-
-# sesarch -s 14883
-14883,http://archive.openwrt.org/chaos_calmer/15.05/ar71xx/generic/openwrt-15.05-ar71xx-generic-ubnt-rs-squashfs-sysupgrade.bin,http://archive.openwrt.org/chaos_calmer/15.05/ar71xx/generic,14550@14759@14567@14545@14744@14591@14693@14745@14855@14848@14764@14876@14867,share/15.05-cc3a47a374475253f93a08eea6eaadce,share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.18.20,share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.18.20/vmlinux,share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/vmlinux.elf-debug-info,share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/linux-3.18.20/.config,share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/linux-ar71xx_generic/makeout.txt,share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/build_dir/target-mips_34kc_uClibc-0.9.33.2/OpenWrt-SDK-15.05-ar71xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/bin/mips-openwrt-linux-gcc,share/15.05-cc3a47a374475253f93a08eea6eaadce/./chaos_calmer-15.05/bin/ar71xx/openwrt-15.05-ar71xx-generic-ubnt-rs-squashfs-sysupgrade.bin
+## summary
+```
+# csv
+ 0    1    2      3        4              5             6         7        8         9    10  11
+uuid,hash,url,homepage,build_at,vmlinux_debug_info,source_code,vmlinux,dot_config,makeout,gcc,bin
 ```
 
 ## license
