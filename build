@@ -174,7 +174,7 @@ def summary_by_uuid(uuid, hash_of_image_builder, url, support_list):
             v = support_list[i]
             info.append(v)
         else:
-            info.append(None)
+            info.append('')
 
     gcc_results = os.popen('cd {} && find -name *-openwrt-linux-gcc'.format(build_at)).readlines()
     # 11
@@ -182,7 +182,7 @@ def summary_by_uuid(uuid, hash_of_image_builder, url, support_list):
         path_to_gcc = os.path.join(build_at, gcc_results[0].strip())
         info.append(path_to_gcc)
     else:
-        info.append(None)
+        info.append('')
 
     binary = os.path.basename(url)
     binary_results = os.popen('cd {} && find -name {}'.format(build_at, binary)).readlines()
@@ -191,14 +191,15 @@ def summary_by_uuid(uuid, hash_of_image_builder, url, support_list):
         path_to_binary = os.path.join(build_at, binary_results[0].strip())
         info.append(path_to_binary)
     else:
-        info.append(None)
+        info.append('')
 
     with open('summary/{}.summary'.format(uuid), 'w') as f:
         f.write(','.join(info))
-    print('summary at summary/{}.summary'.format(uuid))
+    print('\tsummary at summary/{}.summary'.format(uuid))
 
 
 def search():
+    print('update summary for all firmware')
     # first, update support list
     support_list = update_support_list()
 
@@ -207,7 +208,7 @@ def search():
     with open('image.builder.csv') as f:
         for line in f:
             things = line.strip().split(',')
-            image_builder_table[things[0]] = {'url': things[1], 'support': things[2:]}
+            image_builder_table[things[0]] = {'url': things[2], 'support': things[3:]}
 
     # read from machines.csv
     id_urls = {}
@@ -218,18 +219,13 @@ def search():
 
     for k, v in image_builder_table.items():
         if k not in support_list:
-            print('can not support {} {} {}'.format(k, v['url'], v['support']))
+            print('\tcan not support {} {} {}'.format(k, v['url'], v['support']))
             continue
         for uuid in v['support']:
             summary_by_uuid(uuid, k, id_urls[uuid], support_list[k])
 
 
-def build(to_search=False):
-    # 6. write all to support_list.csv
-    if to_search:
-        search()
-        exit()
-
+def build():
     download_from_firmware_uuid()
     generate_machine_id_url()
 
@@ -281,7 +277,7 @@ def build(to_search=False):
 
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == '-s':
-        build(to_search=True)
+        search()
     elif len(sys.argv) == 1:
         build()
     else:
