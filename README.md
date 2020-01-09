@@ -1,9 +1,8 @@
 # openwrt-build-docker
 
-Docker files for OpenWRT building envs.
+Docker files for OpenWRT building envs refer to [firmware-uuid](https://github.com/cyruscyliu/firmware-uuid).
 
-+ for [llbic](https://github.com/cyruscyliu/llbic), the volume option should be 
-`-v path/to/openwrt-build-docker/share:/root/firmware`
++ for docker, the volume option should be `-v path/to/openwrt-build-docker/share:/root/firmware`
 + for the first time, check [dependency](#dependency) and [flow](#flow)
 
 ## statistics
