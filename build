@@ -155,21 +155,21 @@ def update_support_list():
 
 def summary_by_uuid(uuid, hash_of_image_builder, url, support_list):
     info = [uuid, hash_of_image_builder, url]
-    # 0/1/2/3
+    # 0/1/2
 
     openwrtver = url.split('/')[4]
     homepage = os.path.dirname(url)
     info.append(homepage)
-    # 4
+    # 3
 
     build_at = "share/{}-{}".format(openwrtver, hash_of_image_builder)
     info.append(build_at)
-    # 5
+    # 4
 
     # find path to vmlinux and path to source code
     for i in ['path_to_vmlinux_debug_info', 'path_to_source_code',
               'path_to_vmlinux', 'path_to_dot_config', 'path_to_makeout']:
-        # 6/7/8/9/10
+        # 5/6/7/8/9
         if i in support_list:
             v = support_list[i]
             info.append(v)
@@ -177,7 +177,7 @@ def summary_by_uuid(uuid, hash_of_image_builder, url, support_list):
             info.append('')
 
     gcc_results = os.popen('cd {} && find -name *-openwrt-linux-gcc'.format(build_at)).readlines()
-    # 11
+    # 10
     if len(gcc_results):
         path_to_gcc = os.path.join(build_at, gcc_results[0].strip())
         info.append(path_to_gcc)
@@ -186,7 +186,7 @@ def summary_by_uuid(uuid, hash_of_image_builder, url, support_list):
 
     binary = os.path.basename(url)
     binary_results = os.popen('cd {} && find -name {}'.format(build_at, binary)).readlines()
-    # 12
+    # 11
     if len(binary_results):
         path_to_binary = os.path.join(build_at, binary_results[0].strip())
         info.append(path_to_binary)
