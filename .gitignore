@@ -2,8 +2,9 @@
 .idea
 __pycache__
 *.pyc
-backfire_10.03
-chaos_calmer-15.05
+pyenv
+# download
+firmadyne.openwrt.162.csv
 *.tar.gz
 *.tar.bz2
 *.zip
@@ -11,4 +12,5 @@ OpenWrt-ImageBuilder-*
 10.03-*
 12.09-*
 15.05-*
-pyenv
+backfire_10.03
+chaos_calmer-15.05

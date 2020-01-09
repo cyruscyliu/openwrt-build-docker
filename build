@@ -4,9 +4,43 @@ We are going to build machines in machines.csv.
 """
 import os
 import sys
-import errno
 import hashlib
 from pyquery import PyQuery as pq
+
+OPENWRT_VERSIONS = ['10.03', '12.09', '15.05']
+
+
+def download_from_firmware_uuid():
+    print('download firmadyne.openwrt.162.csv from firmware-uuid')
+    os.system('rm firmadyne.openwrt.162.csv')
+    os.system('wget https://raw.githubusercontent.com/cyruscyliu/firmware-uuid/master/firmadyne.openwrt.162.csv')
+
+
+def generate_machine_id_url():
+    header = None
+    records = []
+
+    with open('firmadyne.openwrt.162.csv') as f:
+        for line in f:
+            items = line.strip().split(',')
+            if header is None:
+                header = items
+            kernel_extracted = items[header.index('kernel_extracted')]
+            if kernel_extracted != 't':
+                continue
+            records.append(items)
+    machines = []
+    for record in records:
+        uuid = record[header.index('id')]
+        url = record[header.index('url')]
+        machines.append([uuid, url])
+
+    with open('machines.csv', 'w') as f:
+        f.write(','.join(['id', 'url']))
+        f.write('\n')
+        for machine in machines:
+            f.write(','.join(machine))
+            f.write('\n')
 
 
 def find_urls_in_openwrt_homepage(homepage):
@@ -20,7 +54,7 @@ def find_urls_in_openwrt_homepage(homepage):
     dot_config = None
     for item in a.items():
         href = item.attr('href')
-        if image_builder is None and href.find('ImageBuilder') != -1:
+        if image_builder is None and href.lower().find('imagebuilder') != -1:
             image_builder = os.path.join(homepage, href)
         if dot_config is None and (href.find('config.diff') != -1 or href.find('OpenWrt.config') != -1):
             dot_config = os.path.join(homepage, href)
@@ -28,7 +62,16 @@ def find_urls_in_openwrt_homepage(homepage):
 
 
 def build_hash_of_url_to_image_builder():
+    print('search for image builders')
     header = None
+
+    # read from image.builder.csv
+    cache_image_builder_table = {}
+    with open('image.builder.csv') as f:
+        for line in f:
+            things = line.strip().split(',')
+            cache_image_builder_table[things[1]] = things[2]
+
     image_builder_table = {}
     with open('machines.csv') as f:
         for line in f:
@@ -38,8 +81,18 @@ def build_hash_of_url_to_image_builder():
                 continue
             uuid = items[header.index('id')]
             url = items[header.index('url')]
+            openwrtver = url.split('/')[4]
+            if openwrtver not in OPENWRT_VERSIONS:
+                continue
             homepage = os.path.dirname(url)
-            url_to_image_builder, _ = find_urls_in_openwrt_homepage(homepage)
+            print('\tfind image builder in {}'.format(homepage))
+            if homepage in cache_image_builder_table:
+                url_to_image_builder = cache_image_builder_table[homepage]
+            else:
+                url_to_image_builder, _ = find_urls_in_openwrt_homepage(homepage)
+            if url_to_image_builder is None:
+                print('cannot find the image builder, skip it')
+                continue
             hash_of_image_builder = hashlib.md5(url_to_image_builder.encode('utf-8'))
             if hash_of_image_builder.hexdigest() in image_builder_table:
                 # we also found many firmware share the same ImageBuilder
@@ -47,125 +100,164 @@ def build_hash_of_url_to_image_builder():
                 image_builder_table[hash_of_image_builder.hexdigest()]['support'].append(uuid)
             else:
                 image_builder_table[hash_of_image_builder.hexdigest()] = \
-                    {'url': url_to_image_builder, 'support': [uuid]}
+                    {'homepage': homepage, 'url': url_to_image_builder, 'support': [uuid]}
     return image_builder_table
 
 
-def build(search=False):
+def update_support_list():
+    support_list = {}
+    for one_building_dir in os.listdir('share'):
+        full_path = os.path.join('share', one_building_dir)
+        if os.path.isfile(full_path):
+            continue
+        openwrtver, _, hash_of_image_builder = one_building_dir.partition('-')
+        if not len(hash_of_image_builder):
+            continue
+        # fine makeout.txt
+        makeout = os.popen('cd {} && find -name makeout.txt'.format(full_path)).readlines()
+        # find vmlinux.elf-debug-info
+        vmlinux_debug_results = os.popen('cd {} && find -name vmlinux.elf-debug-info'.format(full_path)).readlines()
+        set_vmlinux_debug = set([os.path.dirname(path) for path in vmlinux_debug_results])
+        # find vmlinux
+        vmlinux_results = os.popen('cd {} && find -name vmlinux'.format(full_path)).readlines()
+        set_vmlinux = set([os.path.dirname(os.path.dirname(path)) for path in vmlinux_results])
+        target_dirs = set_vmlinux_debug & set_vmlinux
+        if not len(target_dirs):
+            continue
+        # find .config
+        dot_config_results = os.popen('cd {} && find -name .config'.format(full_path)).readlines()
+        set_config = set([os.path.dirname(os.path.dirname(path)) for path in dot_config_results])
+        target_dirs = target_dirs & set_config
+        if not len(target_dirs):
+            continue
+        # fill in support list
+        support_list[hash_of_image_builder] = {}
+        target_dir = list(target_dirs)[0]
+        # vmlinux.elf-debug-info
+        for path in vmlinux_debug_results:
+            if os.path.dirname(path) == target_dir:
+                support_list[hash_of_image_builder]['path_to_vmlinux_debug_info'] = \
+                    os.path.join(full_path, path.strip())
+        # source code
+        for path in vmlinux_results:
+            if os.path.dirname(os.path.dirname(path)) == target_dir and os.path.basename(
+                    os.path.dirname(path)).find('linux') != -1:
+                support_list[hash_of_image_builder]['path_to_source_code'] = \
+                    os.path.join(full_path, os.path.dirname(path.strip()))
+                support_list[hash_of_image_builder]['path_to_vmlinux'] = os.path.join(full_path, path.strip())
+                support_list[hash_of_image_builder]['path_to_dot_config'] = \
+                    os.path.join(full_path, os.path.join(os.path.dirname(path.strip()), '.config'))
+        # makeout
+        if len(makeout):
+            support_list[hash_of_image_builder]['path_to_makeout'] = os.path.join(full_path, makeout[0].strip())
+    return support_list
+
+
+def summary_by_uuid(uuid, hash_of_image_builder, url, support_list):
+    info = [uuid, hash_of_image_builder, url]
+    # 0/1/2/3
+
+    openwrtver = url.split('/')[4]
+    homepage = os.path.dirname(url)
+    info.append(homepage)
+    # 4
+
+    build_at = "share/{}-{}".format(openwrtver, hash_of_image_builder)
+    info.append(build_at)
+    # 5
+
+    # find path to vmlinux and path to source code
+    for i in ['path_to_vmlinux_debug_info', 'path_to_source_code',
+              'path_to_vmlinux', 'path_to_dot_config', 'path_to_makeout']:
+        # 6/7/8/9/10
+        if i in support_list:
+            v = support_list[i]
+            info.append(v)
+        else:
+            info.append(None)
+
+    gcc_results = os.popen('cd {} && find -name *-openwrt-linux-gcc'.format(build_at)).readlines()
+    # 11
+    if len(gcc_results):
+        path_to_gcc = os.path.join(build_at, gcc_results[0].strip())
+        info.append(path_to_gcc)
+    else:
+        info.append(None)
+
+    binary = os.path.basename(url)
+    binary_results = os.popen('cd {} && find -name {}'.format(build_at, binary)).readlines()
+    # 12
+    if len(binary_results):
+        path_to_binary = os.path.join(build_at, binary_results[0].strip())
+        info.append(path_to_binary)
+    else:
+        info.append(None)
+
+    with open('summary/{}.summary'.format(uuid), 'w') as f:
+        f.write(','.join(info))
+    print('summary at summary/{}.summary'.format(uuid))
+
+
+def search():
+    # first, update support list
+    support_list = update_support_list()
+
+    # read from image.builder.csv
+    image_builder_table = {}
+    with open('image.builder.csv') as f:
+        for line in f:
+            things = line.strip().split(',')
+            image_builder_table[things[0]] = {'url': things[1], 'support': things[2:]}
+
+    # read from machines.csv
+    id_urls = {}
+    with open('machines.csv') as f:
+        for line in f:
+            things = line.strip().split(',')
+            id_urls[things[0]] = things[1]
+
+    for k, v in image_builder_table.items():
+        if k not in support_list:
+            print('can not support {} {} {}'.format(k, v['url'], v['support']))
+            continue
+        for uuid in v['support']:
+            summary_by_uuid(uuid, k, id_urls[uuid], support_list[k])
+
+
+def build(to_search=False):
     # 6. write all to support_list.csv
-    if search:
-        support_list = {}
-        for one_building_dir in os.listdir('share'):
-            full_path = os.path.join('share', one_building_dir)
-            if os.path.isfile(full_path):
-                continue
-            openwrtver, _, hash_of_image_builder = one_building_dir.partition('-')
-            if not len(hash_of_image_builder):
-                continue
-            # fine makeout.txt
-            makeout = os.popen('cd {} && find -name makeout.txt'.format(full_path)).readlines()
-            # find vmlinux.elf-debug-info
-            vmlinux_debug_results = os.popen('cd {} && find -name vmlinux.elf-debug-info'.format(full_path)).readlines()
-            set_vmlinux_debug = set([os.path.dirname(path) for path in vmlinux_debug_results])
-            # find vmlinux
-            vmlinux_results = os.popen('cd {} && find -name vmlinux'.format(full_path)).readlines()
-            set_vmlinux = set([os.path.dirname(os.path.dirname(path)) for path in vmlinux_results])
-            target_dirs = set_vmlinux_debug & set_vmlinux
-            if not len(target_dirs):
-                continue
-            # find .config
-            dot_config_results = os.popen('cd {} && find -name .config'.format(full_path)).readlines()
-            set_config = set([os.path.dirname(os.path.dirname(path)) for path in dot_config_results])
-            target_dirs = target_dirs & set_config
-            if not len(target_dirs):
-                continue
-            # fill in support list
-            support_list[hash_of_image_builder] = {}
-            target_dir = list(target_dirs)[0]
-            # vmlinux.elf-debug-info
-            for path in vmlinux_debug_results:
-                if os.path.dirname(path) == target_dir:
-                    support_list[hash_of_image_builder]['path_to_vmlinux_debug_info'] = \
-                        os.path.join(full_path, path.strip())
-            # source code
-            for path in vmlinux_results:
-                if os.path.dirname(os.path.dirname(path)) == target_dir and os.path.basename(
-                        os.path.dirname(path)).find('linux') != -1:
-                    support_list[hash_of_image_builder]['path_to_source_code'] = \
-                        os.path.join(full_path, os.path.dirname(path.strip()))
-                    support_list[hash_of_image_builder]['path_to_vmlinux'] = os.path.join(full_path, path.strip())
-                    support_list[hash_of_image_builder]['path_to_dot_config'] = \
-                        os.path.join(full_path, os.path.join(os.path.dirname(path.strip()), '.config'))
-            # makeout
-            if len(makeout):
-                support_list[hash_of_image_builder]['path_to_makeout'] = os.path.join(full_path, makeout[0].strip())
-            else:
-                support_list[hash_of_image_builder]['path_to_makeout'] = ''
+    if to_search:
+        search()
+        exit()
 
-        old_support_list = {}
-        if os.path.exists('support_list.csv'):
-            with open('support_list.csv', 'r') as f:
-                for line in f:
-                    hash_of_image_builder, vmlinux_debug_info, source_code, vmlinux, dot_config, makeout = \
-                        line.strip().split(',')
-                    if hash_of_image_builder in support_list:
-                        continue
-                    old_support_list[hash_of_image_builder] = {
-                        'path_to_vmlinux_debug_info': vmlinux_debug_info,
-                        'path_to_source_code': source_code,
-                        'path_to_vmlinux': vmlinux,
-                        'path_to_dot_config': dot_config,
-                        'path_to_makeout': makeout
-                    }
-
-        with open('support_list.csv', 'w') as f:
-            for h, v in old_support_list.items():
-                f.write(','.join([h, v['path_to_vmlinux_debug_info'], v['path_to_source_code'], v['path_to_vmlinux'],
-                                  v['path_to_dot_config'], v['path_to_makeout']]))
-                f.write('\n')
-            for h, v in support_list.items():
-                f.write(','.join([h, v['path_to_vmlinux_debug_info'], v['path_to_source_code'], v['path_to_vmlinux'],
-                                  v['path_to_dot_config'], v['path_to_makeout']]))
-                f.write('\n')
-
-        exit(0)
+    download_from_firmware_uuid()
+    generate_machine_id_url()
 
     # we found a .config always in an ImageBuilder
-    if not os.path.exists('image_builder.csv'):
-        image_builder_table = build_hash_of_url_to_image_builder()
-        # save image_builder_table
-        with open('image_builder.csv', 'w') as f:
-            for k, v in image_builder_table.items():
-                f.write('{},{},{}\n'.format(k, v['url'], ','.join(v['support'])))
-    else:
-        image_builder_table = {}
-        with open('image_builder.csv') as f:
-            for line in f:
-                items = line.strip().split(',')
-                image_builder_table[items[0]] = {'url': items[1], 'support': items[2:]}
+    image_builder_table = build_hash_of_url_to_image_builder()
+    # save image_builder_table
+    with open('image.builder.csv', 'w') as f:
+        for k, v in image_builder_table.items():
+            f.write('{},{},{},{}\n'.format(k, v['homepage'], v['url'], ','.join(v['support'])))
 
     # in this loop, prepare the building directory for every firmware
+    print('prepare the building directories')
     for k, v in image_builder_table.items():
-        # TODO: confirm the way to get version
-        print(v['url'])
+        print('\t' + v['url'])
         openwrtver = v['url'].split('/')[4]
-        supported_firmwares = "\n".join(v['support'])
+        if openwrtver not in OPENWRT_VERSIONS:
+            continue
         hash = k
 
-        # 1. mkdir of this firmware (currently we use hash but each firmware a seperate building dir, we need to do this in the 1st round & then check which can be merged later)
-        # name: openwrtversion-hash
+        # 1. mkdir of this firmware (currently we use hash but each firmware a separate building dir,
+        # we need to do this in the 1st round & then check which can be merged later)
+        # name: openwrtver-hash
         one_building_dir = '%s-%s' % (openwrtver, hash)
+        os.makedirs('share/%s' % one_building_dir, exist_ok=True)
 
         image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '')
         config = os.path.join('share', image_builder_name, '.config')
         fast = os.path.exists(config)
-
-        try:
-            if not fast:
-                os.mkdir("share/%s" % (one_building_dir))
-        except OSError as exp:
-            if exp.errno != errno.EEXIST:
-                raise
 
         # 2. download the image_builder to ./share
         if not fast:
@@ -178,6 +270,10 @@ def build(search=False):
                     image_builder_name, one_building_dir))
 
         # 4. copy other things (patches to download.pl, makefiles, etc...)
+        if not os.path.exists('share/%s' % (openwrtver)):
+            print('warning: share/%s does not exist' % openwrtver)
+            continue
+
         os.system('cp share/%s/* share/%s' % (openwrtver, one_building_dir))
 
         # 5. build the machine in the specified docker (manually)
@@ -185,7 +281,7 @@ def build(search=False):
 
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == '-s':
-        build(search=True)
+        build(to_search=True)
     elif len(sys.argv) == 1:
         build()
     else:
