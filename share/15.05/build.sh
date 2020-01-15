@@ -18,5 +18,7 @@ cp "Makefile" "$target/target/linux/ar71xx/image/Makefile"
 
 tar -xzf $STORING_DIR/15.05.dl.tar.gz -C $PACKAGE_DIR_NAME
 
+echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
+
 cd $PACKAGE_DIR_NAME || true
 make -j16 V=s >buildout.txt 2>&1
