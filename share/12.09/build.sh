@@ -26,5 +26,7 @@ tar -xf $STORING_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
 #http://mirror2.openwrt.org/sources/opkg-618.tar.gz
 #http://mirror2.openwrt.org/sources/hotplug2-201.tar.gz
 
+echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
+
 cd $PACKAGE_DIR_NAME
 make -j16 V=s >buildout.txt 2>&1

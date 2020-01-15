@@ -20,5 +20,7 @@ cp kernel-config-extra $target/kernel-config-extra
 # feed dependency
 tar -xzf $STORING_DIR/10.03.dl.tar.gz -C $PACKAGE_DIR_NAME
 
+echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
+
 cd $PACKAGE_DIR_NAME || true
 make -j16 V=99 >buildout.txt 2>&1
