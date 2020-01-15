@@ -6,12 +6,11 @@ Docker files for OpenWRT building envs refer to [firmware-uuid](https://github.c
 + for the first time, check [dependency](#dependency) and [flow](#flow)
 
 ## statistics
-
+{'15.05': {'count': 26, 'firmware': 812}, '10.03': {'count': 10, 'firmware': 137}, '12.09': {'count': 18, 'firmware': 518}}
 ||10.03|12.09|15.05|sum|
 |:---:|:---:|:---:|:---:|:---:|
-|firmware we have|16|22|37|75|
-|distinct homepages|7|6|9|22|
-|souce code we support|7|6|9|22|
+|distinct targets|10|18|26|54|
+|firmware blob|137|518|812|1467|
 
 ## automation
 
