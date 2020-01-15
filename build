@@ -11,16 +11,16 @@ OPENWRT_VERSIONS = ['10.03', '12.09', '15.05']
 
 
 def download_from_firmware_uuid():
-    print('download firmadyne.openwrt.162.csv from firmware-uuid')
-    os.system('rm firmadyne.openwrt.162.csv')
-    os.system('wget https://raw.githubusercontent.com/cyruscyliu/firmware-uuid/master/firmadyne.openwrt.162.csv')
+    print('download firmadyne.openwrt.3400.csv from firmware-uuid')
+    os.system('rm firmadyne.openwrt.3400.csv')
+    os.system('wget https://raw.githubusercontent.com/cyruscyliu/firmware-uuid/master/firmadyne.openwrt.3400.csv')
 
 
 def generate_machine_id_url():
     header = None
     records = []
 
-    with open('firmadyne.openwrt.162.csv') as f:
+    with open('firmadyne.openwrt.3400.csv') as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
