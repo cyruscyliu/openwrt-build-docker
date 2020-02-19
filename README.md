@@ -7,6 +7,7 @@ Docker files for OpenWRT building envs refer to [firmware-uuid](https://github.c
 
 ## statistics
 {'15.05': {'count': 26, 'firmware': 812}, '10.03': {'count': 10, 'firmware': 137}, '12.09': {'count': 18, 'firmware': 518}}
+
 ||10.03|12.09|15.05|sum|
 |:---:|:---:|:---:|:---:|:---:|
 |distinct targets|10|18|26|54|
