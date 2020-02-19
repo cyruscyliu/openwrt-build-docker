@@ -7,7 +7,7 @@ import sys
 import hashlib
 from pyquery import PyQuery as pq
 
-OPENWRT_VERSIONS = ['10.03', '12.09', '15.05']
+OPENWRT_VERSIONS = ['10.03', '12.09', '15.05', '17.01.0-rc1']
 
 
 def download_from_firmware_uuid():
@@ -251,7 +251,7 @@ def build():
         one_building_dir = '%s-%s' % (openwrtver, hash)
         os.makedirs('share/%s' % one_building_dir, exist_ok=True)
 
-        image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '')
+        image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '').replace('.tar.xz', '')
         config = os.path.join('share', image_builder_name, '.config')
         fast = os.path.exists(config)
 
@@ -260,10 +260,15 @@ def build():
             os.system('wget -nc {} -P share'.format(v['url']))
 
             # 3. extract .config from the image builder(tar.bz2) to the building dir
-            image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '')
-            os.system(
-                'cd share && tar jxvf {0}.tar.bz2 {0}/.config >/dev/null 2>&1 && cp {0}/.config {1}/OpenWrt.config'.format(
-                    image_builder_name, one_building_dir))
+            image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '').replace('.tar.xz', '')
+            if v['url'].endswith('.tar.bz2'):
+                os.system(
+                    'cd share && tar jxvf {0}.tar.bz2 {0}/.config >/dev/null 2>&1 && cp {0}/.config {1}/OpenWrt.config'.format(
+                        image_builder_name, one_building_dir))
+            elif v['url'].endswith('.tar.xz'):
+                os.system(
+                    'cd share && tar Jxvf {0}.tar.xz {0}/.config >/dev/null 2>&1 && cp {0}/.config {1}/OpenWrt.config'.format(
+                        image_builder_name, one_building_dir))
 
         # 4. copy other things (patches to download.pl, makefiles, etc...)
         if not os.path.exists('share/%s' % (openwrtver)):

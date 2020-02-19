@@ -5,12 +5,16 @@ __pycache__
 pyenv
 # download
 firmadyne.openwrt.162.csv
+*.tar.xz
 *.tar.gz
 *.tar.bz2
 *.zip
 OpenWrt-ImageBuilder-*
+lede-imagebuilder-*
 10.03-*
 12.09-*
 15.05-*
+17.01.0-rc1-*
 backfire_10.03
 chaos_calmer-15.05
+openwrt-17.01.0-rc1

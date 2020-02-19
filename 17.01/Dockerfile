@@ -1,16 +1,16 @@
 FROM ubuntu:18.04
 
-RUN apt-get update &&\
-    apt-get install -y sudo time git-core subversion build-essential gcc-multilib \
-                       libncurses5-dev zlib1g-dev gawk flex gettext wget unzip python &&\
-    apt-get clean
 
-RUN useradd -m openwrt &&\
-    echo 'openwrt ALL=NOPASSWD: ALL' > /etc/sudoers.d/openwrt
+COPY sources.list /etc/apt/sources.list
 
+
+RUN apt-get update && \
+apt-get install -y sudo time git-core subversion build-essential gcc-multilib \
+libncurses5-dev zlib1g-dev gawk flex gettext wget unzip python vim && \
+apt-get clean
+
+# add a user "openwrt" as it is suggested to build as non-root
+RUN useradd -md /home/openwrt openwrt && echo 'openwrt:openwrt' | chpasswd && usermod -aG sudo openwrt 
+RUN mkdir -p /root/firmware && chown -R openwrt:openwrt /root
 USER openwrt
-WORKDIR /home/openwrt
-
-RUN git clone git://git.openwrt.org/openwrt/openwrt.git -b lede-17.01 &&\
-    openwrt/scripts/feeds update -a
 
