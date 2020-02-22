@@ -7,26 +7,26 @@ import sys
 import hashlib
 from pyquery import PyQuery as pq
 
-OPENWRT_VERSIONS = ['10.03', '12.09', '15.05', '17.01.0-rc1']
+OPENWRT_VERSIONS = ['17.01.0-rc1']
+INPUT = 'firmadyne.openwrt.27000.csv'
 
 
 def download_from_firmware_uuid():
-    print('download firmadyne.openwrt.3400.csv from firmware-uuid')
-    os.system('rm firmadyne.openwrt.3400.csv')
-    os.system('wget https://raw.githubusercontent.com/cyruscyliu/firmware-uuid/master/firmadyne.openwrt.3400.csv')
+    # print('download firmadyne.openwrt.3400.csv from firmware-uuid')
+    # os.system('rm firmadyne.openwrt.3400.csv')
+    # os.system('wget https://raw.githubusercontent.com/cyruscyliu/firmware-uuid/master/firmadyne.openwrt.3400.csv')
+    print('use {} locally'.format(INPUT))
 
 
 def generate_machine_id_url():
     header = None
     records = []
 
-    with open('firmadyne.openwrt.3400.csv') as f:
+    with open(INPUT) as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
                 header = items
-            kernel_extracted = items[header.index('kernel_extracted')]
-            if kernel_extracted != 't':
                 continue
             records.append(items)
     machines = []
@@ -90,6 +90,7 @@ def build_hash_of_url_to_image_builder():
                 url_to_image_builder = cache_image_builder_table[homepage]
             else:
                 url_to_image_builder, _ = find_urls_in_openwrt_homepage(homepage)
+                cache_image_builder_table[homepage] = url_to_image_builder
             if url_to_image_builder is None:
                 print('cannot find the image builder, skip it')
                 continue
@@ -225,7 +226,7 @@ def search():
             summary_by_uuid(uuid, k, id_urls[uuid], support_list[k])
 
 
-def build():
+def build(target=None, ndib=False):
     download_from_firmware_uuid()
     generate_machine_id_url()
 
@@ -255,6 +256,14 @@ def build():
         config = os.path.join('share', image_builder_name, '.config')
         fast = os.path.exists(config)
 
+        if target is not None:
+            if v['url'].find(target) != -1:
+                fast = False
+            else:
+                fast = True
+        if ndib:
+            fast = True
+
         # 2. download the image_builder to ./share
         if not fast:
             os.system('wget -nc {} -P share'.format(v['url']))
@@ -281,9 +290,24 @@ def build():
 
 
 if __name__ == '__main__':
+    """
+    # update and download image builders
+    ./build
+    # update and don't download the image builders
+    ./build -ndib
+    # update the target and download the image builders
+    ./build -t ar71xx
+    # summary
+    ./build -s
+    """
     if len(sys.argv) == 2 and sys.argv[1] == '-s':
         search()
+    elif len(sys.argv) == 2 and sys.argv[1] == '-ndib':
+        build(ndib=True)
+    elif len(sys.argv) == 3 and sys.argv[1] == '-t':
+        build(target=sys.argv[2])
     elif len(sys.argv) == 1:
         build()
     else:
-        print('usage {} [-s]'.format(sys.argv[0]))
+        print('usage {} [-s] or [-ndib]'.format(sys.argv[0]))
+
