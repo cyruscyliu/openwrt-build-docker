@@ -17,6 +17,7 @@ cp "kernel-config-extra" "$target/kernel-config-extra"
 cp "010-automake-port-to-Perl-5.22-and-later.patch" "$target/tools/automake/patches"
 cp "005-misc-rename-copy_file_range-to-copy_file_chunk.patch" "$target/tools/e2fsprogs/patches"
 cp "200-fix-zero-as-null.patch" "$target/toolchain/gdb/patches"
+cp "image-commands.mk" "$target/include/image-commands.mk"
 
 tar -xzf $STORING_DIR/17.01.dl.tar.gz -C $PACKAGE_DIR_NAME
 
