@@ -111,7 +111,12 @@ def update_support_list():
         full_path = os.path.join('share', one_building_dir)
         if os.path.isfile(full_path):
             continue
-        openwrtver, _, hash_of_image_builder = one_building_dir.partition('-')
+        items = one_building_dir.split('-')
+        if len(items) == 3:
+            openwrtver = '-'.join(items[:2])
+        else:
+            openwrtver = items[0]
+        hash_of_image_builder = items[-1]
         if openwrtver not in OPENWRT_VERSIONS:
             continue
         if not len(hash_of_image_builder):
