@@ -112,6 +112,8 @@ def update_support_list():
         if os.path.isfile(full_path):
             continue
         openwrtver, _, hash_of_image_builder = one_building_dir.partition('-')
+        if openwrtver not in OPENWRT_VERSIONS:
+            continue
         if not len(hash_of_image_builder):
             continue
         # fine makeout.txt
@@ -151,6 +153,7 @@ def update_support_list():
         # makeout
         if len(makeout):
             support_list[hash_of_image_builder]['path_to_makeout'] = os.path.join(full_path, makeout[0].strip())
+        print('\tupdate support list for {}'.format(full_path))
     return support_list
 
 
@@ -199,8 +202,8 @@ def summary_by_uuid(uuid, hash_of_image_builder, url, support_list):
     print('\tsummary at summary/{}.summary'.format(uuid))
 
 
-def search():
-    print('update summary for all firmware')
+def search(target=None):
+    print('update summary')
     # first, update support list
     support_list = update_support_list()
 
@@ -209,6 +212,8 @@ def search():
     with open('image.builder.csv') as f:
         for line in f:
             things = line.strip().split(',')
+            if target is not None and things[2].find(target) == -1:
+                continue
             image_builder_table[things[0]] = {'url': things[2], 'support': things[3:]}
 
     # read from machines.csv
@@ -297,8 +302,10 @@ if __name__ == '__main__':
     ./build -ndib
     # update the target and download the image builders
     ./build -t ar71xx
-    # summary
+    # summary all
     ./build -s
+    # summary one target
+    ./build -s -t oxnas
     """
     if len(sys.argv) == 2 and sys.argv[1] == '-s':
         search()
@@ -306,6 +313,8 @@ if __name__ == '__main__':
         build(ndib=True)
     elif len(sys.argv) == 3 and sys.argv[1] == '-t':
         build(target=sys.argv[2])
+    elif len(sys.argv) == 4 and sys.argv[1] == '-s' and sys.argv[2] == '-t':
+        search(target=sys.argv[3])
     elif len(sys.argv) == 1:
         build()
     else:
