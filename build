@@ -7,7 +7,7 @@ import sys
 import hashlib
 from pyquery import PyQuery as pq
 
-OPENWRT_VERSIONS = ['17.01.0-rc1']
+OPENWRT_VERSIONS = ['18.06.4']
 INPUT = 'firmadyne.openwrt.27000.csv'
 
 

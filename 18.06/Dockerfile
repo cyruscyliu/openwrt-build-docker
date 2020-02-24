@@ -6,7 +6,7 @@ COPY sources.list /etc/apt/sources.list
 
 RUN apt-get update && \
 apt-get install -y sudo time git-core subversion build-essential gcc-multilib \
-libncurses5-dev zlib1g-dev gawk flex gettext wget unzip python vim && \
+curl libncurses5-dev zlib1g-dev gawk flex gettext wget unzip python vim && \
 apt-get clean
 
 # add a user "openwrt" as it is suggested to build as non-root
