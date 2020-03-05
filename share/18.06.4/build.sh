@@ -15,7 +15,7 @@ cp "OpenWrt.config" "$target/.config"
 cp "kernel-defaults.mk" "$target/include/kernel-defaults.mk"
 cp "kernel-config-extra" "$target/kernel-config-extra"
 
-# tar -xzf $STORING_DIR/17.01.dl.tar.gz -C $PACKAGE_DIR_NAME
+tar -xzf $STORING_DIR/18.06.dl.tar.gz -C $PACKAGE_DIR_NAME
 
 echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
 
