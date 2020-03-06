@@ -3,7 +3,10 @@ DOWNLOAD_URL="https://github.com/openwrt/archive/archive/v12.09.tar.gz"
 PACKAGE_NAME="v12.09.tar.gz"
 PACKAGE_DIR_NAME="archive-12.09"
 
-export STORING_DIR=/root/firmware
+STORING_DIR=/root/firmware
+CACHE_DIR=/root/firmware/cache
+NPROC=`nproc --all`
+
 echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
 cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- || true
@@ -19,7 +22,10 @@ cp generic.mk $target/target/linux/orion/image/generic.mk
 cp Makefile $target/target/linux/ramips/image/Makefile
 
 # feed dependency
-tar -xf $STORING_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
+if [ -f "$CACHE_DIR/12.09.dl.tar.gz" ]
+then
+    tar -xf $CACHE_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
+fi
 
 # If not use the dl provided by us, you should additionally download the following 2 packages.
 # And put them into the $target/dl
@@ -29,4 +35,4 @@ tar -xf $STORING_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
 echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
 
 cd $PACKAGE_DIR_NAME
-make -j16 V=s >buildout.txt 2>&1
+make -j${NPROC} V=s >buildout.txt 2>&1

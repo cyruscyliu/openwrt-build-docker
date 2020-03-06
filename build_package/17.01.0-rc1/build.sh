@@ -3,7 +3,10 @@ DOWNLOAD_URL="https://github.com/openwrt/openwrt/archive/v17.01.0-rc1.tar.gz"
 PACKAGE_NAME="v17.01.0-rc1.tar.gz"
 PACKAGE_DIR_NAME="openwrt-17.01.0-rc1"
 
-export STORING_DIR=/root/firmware
+STORING_DIR=/root/firmware
+CACHE_DIR=/root/firmware/cache
+NPROC=`nproc --all`
+
 echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
 cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- || true
@@ -19,9 +22,12 @@ cp "005-misc-rename-copy_file_range-to-copy_file_chunk.patch" "$target/tools/e2f
 cp "200-fix-zero-as-null.patch" "$target/toolchain/gdb/patches"
 cp "image-commands.mk" "$target/include/image-commands.mk"
 
-tar -xzf $STORING_DIR/17.01.dl.tar.gz -C $PACKAGE_DIR_NAME
+if [ -f "$CACHE_DIR/17.01.dl.tar.gz" ]
+then
+    tar -xzf $CACHE_DIR/17.01.dl.tar.gz -C $PACKAGE_DIR_NAME
+fi
 
 echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
 
 cd $PACKAGE_DIR_NAME || true
-make -j16 V=s >buildout.txt 2>&1
+make -j${NPROC} V=s >buildout.txt 2>&1

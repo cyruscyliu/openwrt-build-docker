@@ -3,7 +3,10 @@ DOWNLOAD_URL="https://github.com/openwrt/chaos_calmer/archive/v15.05.zip"
 PACKAGE_NAME="v15.05.zip"
 PACKAGE_DIR_NAME="chaos_calmer-15.05"
 
-export STORING_DIR=/root/firmware
+STORING_DIR=/root/firmware
+CACHE_DIR=/root/firmware/cache
+NPROC=`nproc --all`
+
 echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
 cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- || true
@@ -16,9 +19,12 @@ cp "kernel-defaults.mk" "$target/include/kernel-defaults.mk"
 cp "kernel-config-extra" "$target/kernel-config-extra"
 cp "Makefile" "$target/target/linux/ar71xx/image/Makefile"
 
-tar -xzf $STORING_DIR/15.05.dl.tar.gz -C $PACKAGE_DIR_NAME
+if [ -f "$CACHE_DIR/15.05.dl.tar.gz" ]
+then
+    tar -xzf $CACHE_DIR/15.05.dl.tar.gz -C $PACKAGE_DIR_NAME
+fi
 
 echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
 
 cd $PACKAGE_DIR_NAME || true
-make -j16 V=s >buildout.txt 2>&1
+make -j${NPROC} V=s >buildout.txt 2>&1

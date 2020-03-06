@@ -13,3 +13,4 @@ services:
       - ALL
     volumes:
       - ${BUILD_DIR}:/root/firmware
+      - ${CACHE_DIR}:/root/firmware/cache
