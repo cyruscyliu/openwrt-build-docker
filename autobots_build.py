@@ -7,16 +7,21 @@ import os
 from pathlib import Path
 from datetime import datetime
 
-COMPILE_PKG_PATH = './compile_package'
-BUILD_PKG_PATH = './build_package'
+# this should be changed if we are used as a runtime imported library
+WORK_BASE = '.'
+COMPILE_PKG_PATH = WORK_BASE + '/compile_package'
+BUILD_PKG_PATH = WORK_BASE + '/build_package'
 
 def get_current_time_str():
     return datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
 
 def make_compile_docker(openwrt_ver):
+    global COMPILE_PKG_PATH
+
     # check whether this version of openwrt is supported
     compile_path = Path(COMPILE_PKG_PATH) / openwrt_ver
     if not compile_path.exists():
+        print('[+] Error compile_path %s not exist' % (compile_path))
         return None
     
     build_script = str((compile_path / 'build.sh').absolute())
@@ -24,16 +29,20 @@ def make_compile_docker(openwrt_ver):
 
     ret = os.system('cd %s && bash %s' % (str(compile_path.absolute()), build_script))
     if ret != 0:
+        print('[+] Error compile docker build_script %s returns non-zero' % (build_script))
         return None
 
     return compile_script
 
 def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
+    global BUILD_PKG_PATH
+
     os.system('mkdir -p %s' % (target_dir))
 
     # check whether this version of openwrt is supported
     build_pkg_path = Path(BUILD_PKG_PATH) / openwrt_ver
     if not build_pkg_path.exists():
+        print('[+] build_pkg_path %s not exist' % (build_pkg_path))
         return None
 
     build_dir = None
@@ -44,10 +53,12 @@ def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
     
     ret = os.system('cp -r %s %s' % (build_pkg_path, build_dir))
     if ret != 0:
+        print('[+] copy build_pkg_path %s to build_dir %s error' % (build_pkg_path, build_dir))
         return None
     
     ret = os.system('cp %s %s/OpenWrt.config' % (config_path, build_dir))
     if ret != 0:
+        print('[+] copy config %s to build_dir %s error' % (config_path, build_dir))
         return None
     
     return str(build_dir.absolute())
@@ -55,6 +66,7 @@ def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
 def do_the_building(build_dir, compile_script):
     ret = os.system('bash %s %s' % (compile_script, build_dir))
     if ret != 0:
+        print('[+] Error compile_script %s returns non-zero' % (compile_script))
         return False
     
     return True
@@ -68,14 +80,20 @@ def one_work_flow(target_dir, openwrt_ver, config_path, build=False, tag=None):
     '''
     compile_script = make_compile_docker(openwrt_ver)
     if compile_script == None:
+        print('[+] Error compile_script is None')
         return False
 
     build_dir = make_build_package(target_dir, openwrt_ver, config_path, tag=tag)
     if build_dir == None:
+        print('[+] Error build_dir is None')
         return False
 
     if build:
-        print('hahaha', build_dir, compile_script)
         return do_the_building(build_dir, compile_script)
     
     return True
+
+def change_work_base(base):
+    global WORK_BASE
+
+    WORK_BASE = base
