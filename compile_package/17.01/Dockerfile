@@ -1,8 +1,9 @@
 FROM ubuntu:18.04
 
 
-COPY sources.list /etc/apt/sources.list
+#COPY sources.list /etc/apt/sources.list
 
+ENV HOSTNAME owrt-17.01-build-env
 
 RUN apt-get update && \
 apt-get install -y sudo time git-core subversion build-essential gcc-multilib \
