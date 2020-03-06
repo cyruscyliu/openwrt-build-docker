@@ -2,8 +2,9 @@
 DOWNLOAD_URL="https://archive.openwrt.org/backfire/10.03/backfire_10.03_source.tar.bz2"
 PACKAGE_NAME="backfire_10.03_source.tar.bz2"
 PACKAGE_DIR_NAME="backfire_10.03"
+STORING_DIR=/root/firmware
+NPROC=`nproc --all`
 
-export STORING_DIR=/root/firmware
 echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
 cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- || true
@@ -23,4 +24,4 @@ tar -xzf $STORING_DIR/10.03.dl.tar.gz -C $PACKAGE_DIR_NAME
 echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
 
 cd $PACKAGE_DIR_NAME || true
-make -j16 V=99 >buildout.txt 2>&1
+make -j${NPROC} V=99 >buildout.txt 2>&1
