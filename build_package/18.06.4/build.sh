@@ -20,6 +20,7 @@ cp "kernel-config-extra" "$target/kernel-config-extra"
 
 #if [ -f "$CACHE_DIR/18.06.dl.tar.gz" ]
 #then
+#    echo "using cached download file to accelerate"
 #    tar -xzf $CACHE_DIR/18.06.dl.tar.gz -C $PACKAGE_DIR_NAME
 #fi
 

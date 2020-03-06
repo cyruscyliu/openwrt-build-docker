@@ -23,6 +23,7 @@ cp kernel-config-extra $target/kernel-config-extra
 # feed dependency if it is predownloaded
 if [ -f "$CACHE_DIR/10.03.dl.tar.gz" ]
 then
+    echo "using cached download file to accelerate"
     tar -xzf $CACHE_DIR/10.03.dl.tar.gz -C $PACKAGE_DIR_NAME
 fi
 

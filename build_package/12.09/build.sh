@@ -24,6 +24,7 @@ cp Makefile $target/target/linux/ramips/image/Makefile
 # feed dependency
 if [ -f "$CACHE_DIR/12.09.dl.tar.gz" ]
 then
+    echo "using cached download file to accelerate"
     tar -xf $CACHE_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
 fi
 

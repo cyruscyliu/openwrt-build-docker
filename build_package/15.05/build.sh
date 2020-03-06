@@ -21,6 +21,7 @@ cp "Makefile" "$target/target/linux/ar71xx/image/Makefile"
 
 if [ -f "$CACHE_DIR/15.05.dl.tar.gz" ]
 then
+    echo "using cached download file to accelerate"
     tar -xzf $CACHE_DIR/15.05.dl.tar.gz -C $PACKAGE_DIR_NAME
 fi
 
