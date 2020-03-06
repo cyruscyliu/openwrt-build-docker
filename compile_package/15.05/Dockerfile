@@ -1,6 +1,8 @@
 FROM ubuntu:14.04
 
-COPY sources.list /etc/apt/sources.list
+#COPY sources.list /etc/apt/sources.list
+
+ENV HOSTNAME owrt-15.05-build-env
 
 RUN apt-get update
 RUN apt-get install -y libssl-dev zlib1g-dev autotools-dev zip automake gcc \
