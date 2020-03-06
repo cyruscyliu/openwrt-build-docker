@@ -24,6 +24,7 @@ cp "image-commands.mk" "$target/include/image-commands.mk"
 
 if [ -f "$CACHE_DIR/17.01.dl.tar.gz" ]
 then
+    echo "using cached download file to accelerate"
     tar -xzf $CACHE_DIR/17.01.dl.tar.gz -C $PACKAGE_DIR_NAME
 fi
 

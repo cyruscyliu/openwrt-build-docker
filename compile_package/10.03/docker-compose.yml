@@ -1,6 +1,6 @@
 version: "2"
 services:
-  firmware:
+  firmware-build:
     image: openwrt-10.03:latest
     # network_mode: "host"
     command: ["sh", "-c", "while true; do sleep 1s; done"]

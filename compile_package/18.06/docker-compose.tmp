@@ -1,6 +1,6 @@
 version: "3"
 services:
-  firmware:
+  firmware-build:
     image:  openwrt-18.06:latest
     # network_mode: "host"
     command: ["bash", "-c", "/root/firmware/build.sh"]
