@@ -19,14 +19,14 @@ def make_compile_docker(openwrt_ver):
     if not compile_path.exists():
         return None
     
-    build_script = compile_path / 'build.sh'
-    compile_script = compile_path / 'compile.sh'
+    build_script = str((compile_path / 'build.sh').absolute())
+    compile_script = str((compile_path / 'compile.sh').absolute())
 
-    ret = os.system('bash %s' % (build_script))
+    ret = os.system('cd %s && bash %s' % (str(compile_path.absolute()), build_script))
     if ret != 0:
         return None
 
-    return str(compile_script.absolute())
+    return compile_script
 
 def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
     os.system('mkdir -p %s' % (target_dir))
@@ -43,6 +43,10 @@ def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
         build_dir = Path(target_dir) / (openwrt_ver + '-' + get_current_time_str())
     
     ret = os.system('cp -r %s %s' % (build_pkg_path, build_dir))
+    if ret != 0:
+        return None
+    
+    ret = os.system('cp %s %s/OpenWrt.config' % (config_path, build_dir))
     if ret != 0:
         return None
     
@@ -71,6 +75,7 @@ def one_work_flow(target_dir, openwrt_ver, config_path, build=False, tag=None):
         return False
 
     if build:
+        print('hahaha', build_dir, compile_script)
         return do_the_building(build_dir, compile_script)
     
     return True
