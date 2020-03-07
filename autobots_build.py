@@ -40,8 +40,6 @@ def make_compile_docker(openwrt_ver):
 def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
     global BUILD_PKG_PATH
 
-    os.system('mkdir -p %s' % (target_dir))
-
     # for build, we believe we need all xx.xx[.xx[-rcx]]
     openwrt_ver = openwrt_ver
 
@@ -57,14 +55,19 @@ def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
     else:
         build_dir = Path(target_dir) / (openwrt_ver + '-' + get_current_time_str())
     
-    ret = os.system('cp -r %s %s' % (build_pkg_path, build_dir))
+    ret = os.system('mkdir -p %s' % (build_dir))
     if ret != 0:
-        print('[+] copy build_pkg_path %s to build_dir %s error' % (build_pkg_path, build_dir))
+        print('[+] mkdir for %s error with ret %s' % (build_dir, ret))
+        return None
+
+    ret = os.system('cp -r %s/* %s' % (build_pkg_path, build_dir))
+    if ret != 0:
+        print('[+] copy build_pkg_path %s to build_dir %s error with ret %s' % (build_pkg_path, build_dir, ret))
         return None
     
     ret = os.system('cp %s %s/OpenWrt.config' % (config_path, build_dir))
     if ret != 0:
-        print('[+] copy config %s to build_dir %s error' % (config_path, build_dir))
+        print('[+] copy config %s to build_dir %s error with ret %s' % (config_path, build_dir, ret))
         return None
     
     return str(build_dir.absolute())
