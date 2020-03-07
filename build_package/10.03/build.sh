@@ -45,6 +45,11 @@ make -j${NPROC} V=99 >buildout.txt 2>&1
 ERR=$?
 if [ "${ERR}" -ne 0 ]
 then
-    echo "Build error for the target.subtarget " "${ERR}" > ../BUILD_ERROR
-    exit ${ERR}
+    make -j1 V=99 >buildout.txt 2>&1
+    ERR=$?
+    if [ "${ERR}" -ne 0 ]
+    then
+        echo "Build error for the target.subtarget " "${ERR}" > ../BUILD_ERROR
+        exit ${ERR}
+    fi
 fi
