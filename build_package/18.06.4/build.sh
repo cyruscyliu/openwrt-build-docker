@@ -6,7 +6,7 @@
 DOWNLOAD_URL="https://github.com/openwrt/openwrt/archive/v18.06.4.tar.gz"
 PACKAGE_NAME="v18.06.4.tar.gz"
 PACKAGE_DIR_NAME="openwrt-18.06.4"
-CACHE_DL_TAR="18.06.dl.tar.gz"
+CACHE_DL_TAR="18.06.4.dl.tar.gz"
 
 #
 # global const
@@ -43,6 +43,11 @@ make -j${NPROC} V=s >buildout.txt 2>&1
 ERR=$?
 if [ "${ERR}" -ne 0 ]
 then
-    echo "Build error for the target.subtarget " "${ERR}" > ../BUILD_ERROR
-    exit ${ERR}
+    make -j1 V=s >buildout.txt 2>&1
+    ERR=$?
+    if [ "${ERR}" -ne 0 ]
+    then
+        echo "Build error for the target.subtarget " "${ERR}" > ../BUILD_ERROR
+        exit ${ERR}
+    fi
 fi

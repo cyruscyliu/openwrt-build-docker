@@ -15,6 +15,9 @@ RUN mkdir -p /home/openwrt &&\
     useradd -m -d /home/openwrt openwrt &&\
     echo 'openwrt:openwrt' | chpasswd &&\
     usermod -aG sudo openwrt
-RUN mkdir -p /root/firmware && mkdir -p /root/firmware/cache && chown -R openwrt:openwrt /root
+RUN mkdir -p /root/firmware &&\
+    mkdir -p /root/firmware/cache &&\
+    chown -R openwrt:openwrt /root &&\
+    chown -R openwrt:openwrt /home/openwrt
 
 USER openwrt
