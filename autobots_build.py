@@ -73,7 +73,12 @@ def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
     return str(build_dir.absolute())
 
 def do_the_building(build_dir, compile_script):
+    with open(str((Path(build_dir) / 're_compile.sh').absolute()), 'w') as f:
+        compile_str = '#!/bin/bash\nCOMPOSE_HTTP_TIMEOUT=120 docker-compose -f docker-compose.yml run --rm firmware-build\n'
+        f.write(compile_str)
+
     compile_log = str((Path(build_dir) / 'compile.log').absolute())
+
     ret = os.system('bash -e %s %s > %s 2>&1' % (compile_script, build_dir, compile_log))
     if ret != 0:
         print('[+] Error compile_script %s returns non-zero' % (compile_script))
