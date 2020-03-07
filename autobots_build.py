@@ -30,7 +30,7 @@ def make_compile_docker(openwrt_ver):
     build_script = str((compile_path / 'build.sh').absolute())
     compile_script = str((compile_path / 'compile.sh').absolute())
 
-    ret = os.system('cd %s && bash %s' % (str(compile_path.absolute()), build_script))
+    ret = os.system('cd %s && bash -e %s' % (str(compile_path.absolute()), build_script))
     if ret != 0:
         print('[+] Error compile docker build_script %s returns non-zero' % (build_script))
         return None
@@ -73,7 +73,8 @@ def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
     return str(build_dir.absolute())
 
 def do_the_building(build_dir, compile_script):
-    ret = os.system('bash %s %s' % (compile_script, build_dir))
+    compile_log = str((Path(build_dir) / 'compile.log').absolute())
+    ret = os.system('bash -e %s %s > %s 2>&1' % (compile_script, build_dir, compile_log))
     if ret != 0:
         print('[+] Error compile_script %s returns non-zero' % (compile_script))
         return False
