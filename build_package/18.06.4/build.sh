@@ -1,28 +1,38 @@
-# download the package
+#!/bin/bash
+
+#
+# config part
+#
 DOWNLOAD_URL="https://github.com/openwrt/openwrt/archive/v18.06.4.tar.gz"
 PACKAGE_NAME="v18.06.4.tar.gz"
 PACKAGE_DIR_NAME="openwrt-18.06.4"
+CACHE_DL_TAR="18.06.dl.tar.gz"
 
+#
+# global const
+#
 STORING_DIR=/root/firmware
 CACHE_DIR=/root/firmware/cache
 NPROC=`nproc --all`
 
 echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
-cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- || true
+cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- 
 rm -rf $PACKAGE_DIR_NAME && tar -xf $STORING_DIR/$PACKAGE_NAME
 
+#
 # patch and config
+#
 target=$PACKAGE_DIR_NAME
 cp "OpenWrt.config" "$target/.config"
 cp "kernel-defaults.mk" "$target/include/kernel-defaults.mk"
 cp "kernel-config-extra" "$target/kernel-config-extra"
 
-#if [ -f "$CACHE_DIR/18.06.dl.tar.gz" ]
-#then
-#    echo "using cached download file to accelerate"
-#    tar -xzf $CACHE_DIR/18.06.dl.tar.gz -C $PACKAGE_DIR_NAME
-#fi
+if [ -f "$CACHE_DIR/$CACHE_DL_TAR" ]
+then
+    echo "using cached download file to accelerate"
+    tar -xzf $CACHE_DIR/$CACHE_DL_TAR -C $PACKAGE_DIR_NAME
+fi
 
 echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
 
