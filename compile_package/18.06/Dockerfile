@@ -14,7 +14,7 @@ apt-get clean
 RUN mkdir -p /home/openwrt &&\
     useradd -m -d /home/openwrt openwrt &&\
     echo 'openwrt:openwrt' | chpasswd &&\
-    usermod -aG sudo openwr
+    usermod -aG sudo openwrt
 RUN mkdir -p /root/firmware && chown -R openwrt:openwrt /root
 
 USER openwrt

@@ -18,6 +18,9 @@ def get_current_time_str():
 def make_compile_docker(openwrt_ver):
     global COMPILE_PKG_PATH
 
+    # for compile, currently we believe xx.xx is enough
+    openwrt_ver = '.'.join(openwrt_ver.split('.')[0:2])
+
     # check whether this version of openwrt is supported
     compile_path = Path(COMPILE_PKG_PATH) / openwrt_ver
     if not compile_path.exists():
@@ -38,6 +41,9 @@ def make_build_package(target_dir, openwrt_ver, config_path, tag=None):
     global BUILD_PKG_PATH
 
     os.system('mkdir -p %s' % (target_dir))
+
+    # for build, we believe we need all xx.xx[.xx[-rcx]]
+    openwrt_ver = openwrt_ver
 
     # check whether this version of openwrt is supported
     build_pkg_path = Path(BUILD_PKG_PATH) / openwrt_ver
@@ -95,5 +101,9 @@ def one_work_flow(target_dir, openwrt_ver, config_path, build=False, tag=None):
 
 def change_work_base(base):
     global WORK_BASE
+    global COMPILE_PKG_PATH
+    global BUILD_PKG_PATH
 
     WORK_BASE = base
+    COMPILE_PKG_PATH = WORK_BASE + '/compile_package'
+    BUILD_PKG_PATH = WORK_BASE + '/build_package'
