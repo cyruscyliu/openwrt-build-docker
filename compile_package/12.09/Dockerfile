@@ -11,9 +11,13 @@ gcc g++ sudo vim wget build-essential subversion git-core libncurses5-dev \
 zlib1g-dev gawk flex quilt libssl-dev xsltproc libxml-parser-perl mercurial \
 bzr ecj cvs unzip mercurial
 # add a user "openwrt" as it is suggested to build as non-root
-RUN useradd -m -d /home/openwrt openwrt &&\
+RUN mkdir -p /home/openwrt &&\
+    useradd -m -d /home/openwrt openwrt &&\
     echo 'openwrt:openwrt' | chpasswd &&\
     usermod -aG sudo openwrt
-RUN mkdir -p /root/firmware && mkdir -p /root/firmware/cache && chown -R openwrt:openwrt /root
+RUN mkdir -p /root/firmware &&\
+    mkdir -p /root/firmware/cache &&\
+    chown -R openwrt:openwrt /root &&\
+    chown -R openwrt:openwrt /home/openwrt
 
 USER openwrt
