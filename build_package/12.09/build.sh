@@ -36,4 +36,12 @@ fi
 echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
 
 cd $PACKAGE_DIR_NAME
+
+rm -f ../BUILD_ERROR
 make -j${NPROC} V=s >buildout.txt 2>&1
+ERR=$?
+if [ "${ERR}" -ne 0 ]
+then
+    echo "Build error for the target.subtarget " "${ERR}" > ../BUILD_ERROR
+    exit ${ERR}
+fi

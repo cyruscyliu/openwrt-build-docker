@@ -2,7 +2,7 @@ version: "2"
 services:
   firmware-build:
     image: openwrt-10.03:latest
-    # network_mode: "host"
+    network_mode: "host"
     command: ["bash", "-c", "/root/firmware/build.sh"]
     working_dir: /root/firmware
     privileged: true
