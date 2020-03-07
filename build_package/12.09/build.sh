@@ -1,18 +1,28 @@
-# download the package
+#!/bin/bash
+
+#
+# config part
+#
 DOWNLOAD_URL="https://github.com/openwrt/archive/archive/v12.09.tar.gz"
 PACKAGE_NAME="v12.09.tar.gz"
 PACKAGE_DIR_NAME="archive-12.09"
+CACHE_DL_TAR="12.09.dl.tar.gz"
 
+#
+# global const
+#
 STORING_DIR=/root/firmware
 CACHE_DIR=/root/firmware/cache
 NPROC=`nproc --all`
 
 echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
-cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- || true
+cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- 
 rm -rf $PACKAGE_DIR_NAME && tar -xf $STORING_DIR/$PACKAGE_NAME
 
+#
 # patch and config
+#
 target=$PACKAGE_DIR_NAME
 cp download.pl $target/scripts/download.pl
 cp OpenWrt.config $target/.config
@@ -22,10 +32,10 @@ cp generic.mk $target/target/linux/orion/image/generic.mk
 cp Makefile $target/target/linux/ramips/image/Makefile
 
 # feed dependency
-if [ -f "$CACHE_DIR/12.09.dl.tar.gz" ]
+if [ -f "$CACHE_DIR/$CACHE_DL_TAR" ]
 then
     echo "using cached download file to accelerate"
-    tar -xf $CACHE_DIR/12.09.dl.tar.gz -C $PACKAGE_DIR_NAME
+    tar -xzf $CACHE_DIR/$CACHE_DL_TAR -C $PACKAGE_DIR_NAME
 fi
 
 # If not use the dl provided by us, you should additionally download the following 2 packages.
