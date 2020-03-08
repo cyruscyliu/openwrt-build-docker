@@ -21,16 +21,22 @@ export HOST_EXTRACFLAGS=-I$(STAGING_DIR_HOST)/include
 # defined in quilt.mk
 Kernel/Patch:=$(Kernel/Patch/Default)
 
+ifneq (,$(findstring .xz,$(LINUX_SOURCE)))
+  LINUX_CAT:=xzcat
+else
+  LINUX_CAT:=zcat
+endif
+
 ifeq ($(strip $(CONFIG_EXTERNAL_KERNEL_TREE)),"")
   ifeq ($(strip $(CONFIG_KERNEL_GIT_CLONE_URI)),"")
     define Kernel/Prepare/Default
-	xzcat $(DL_DIR)/$(LINUX_SOURCE) | $(TAR) -C $(KERNEL_BUILD_DIR) $(TAR_OPTIONS)
+	$(LINUX_CAT) $(DL_DIR)/$(LINUX_SOURCE) | $(TAR) -C $(KERNEL_BUILD_DIR) $(TAR_OPTIONS)
 	$(Kernel/Patch)
 	$(if $(QUILT),touch $(LINUX_DIR)/.quilt_used)
     endef
   else
     define Kernel/Prepare/Default
-	xzcat $(DL_DIR)/$(LINUX_SOURCE) | $(TAR) -C $(KERNEL_BUILD_DIR) $(TAR_OPTIONS)
+	$(LINUX_CAT) $(DL_DIR)/$(LINUX_SOURCE) | $(TAR) -C $(KERNEL_BUILD_DIR) $(TAR_OPTIONS)
     endef
   endif
 else
@@ -92,6 +98,13 @@ define Kernel/Configure/Default
 	echo "CONFIG_KALLSYMS_UNCOMPRESSED=y" >> $(LINUX_DIR)/.config.target
 	$(SCRIPT_DIR)/package-metadata.pl kconfig $(TMP_DIR)/.packageinfo $(TOPDIR)/.config $(KERNEL_PATCHVER) > $(LINUX_DIR)/.config.override
 	$(SCRIPT_DIR)/kconfig.pl 'm+' '+' $(LINUX_DIR)/.config.target /dev/null $(LINUX_DIR)/.config.override > $(LINUX_DIR)/.config.set
+#
+# START of self added, more config
+#
+	cat $(TOPDIR)/kernel-config-extra >> $(LINUX_DIR)/.config
+#
+# END of self added
+#
 	$(call Kernel/SetNoInitramfs)
 	rm -rf $(KERNEL_BUILD_DIR)/modules
 	cmp -s $(LINUX_DIR)/.config.set $(LINUX_DIR)/.config.prev || { \
@@ -123,7 +136,13 @@ define Kernel/CopyImage
 		$(KERNEL_CROSS)objcopy -O binary $(OBJCOPY_STRIP) -S $(LINUX_DIR)/vmlinux $(LINUX_KERNEL)$(1); \
 		$(KERNEL_CROSS)objcopy $(OBJCOPY_STRIP) -S $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux$(1).elf; \
 		$(CP) $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux$(1).debug; \
+#\
+# START of self added, backup debug-info\
+#\
 		$(CP) $(LINUX_DIR)/vmlinux $(KERNEL_BUILD_DIR)/vmlinux.elf-debug-info; \
+#\
+# END of self added\
+#\
 		$(foreach k, \
 			$(if $(KERNEL_IMAGES),$(KERNEL_IMAGES),$(filter-out vmlinux dtbs,$(KERNELNAME))), \
 			$(CP) $(LINUX_DIR)/arch/$(LINUX_KARCH)/boot/$(IMAGES_DIR)/$(k) $(KERNEL_BUILD_DIR)/$(k)$(1); \
@@ -133,7 +152,7 @@ endef
 
 define Kernel/CompileImage/Default
 	rm -f $(TARGET_DIR)/init
-	+$(KERNEL_MAKE) $(if $(KERNELNAME),$(KERNELNAME),all) modules V=1 >$(KERNEL_BUILD_DIR)/makeout.txt 2>&1
+	+$(KERNEL_MAKE) $(if $(KERNELNAME),$(KERNELNAME),all) modules
 	$(call Kernel/CopyImage)
 endef
 
