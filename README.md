@@ -135,8 +135,17 @@ pip install pyquery
 
 ### acceleration
 
-Put them in `share` folder.
+Download all the tar.gz files from this [link](https://drive.google.com/drive/folders/1KCdgytkYtWFmiXKlpb6nkqnoRGn9z9Ck?usp=sharing) and put them in `path-to-this-repo/pre_download` folder.
 
-+ [10.03.dl.tar.gz](https://drive.google.com/file/d/1S4TdLBQDgnVv2cifXMhSR1umo5_Bo2tu/view?usp=sharing)
-+ [12.09.dl.tar.gz](https://drive.google.com/open?id=1hc0PujRBhNEn_2zC8_etlGmVJAYHEq6Q)
-+ [15.05.dl.tar.gz](https://drive.google.com/file/d/1R86VpMVnaCLeb_iHCRAqkV_sSTc40-i-/view?usp=sharing)
+These tar.gz will be unzipped and used in the build process, they accelerate the build by skipping the network downloading time.
+
+Currently, we have tars for:
+
+- 10.03
+- 12.09
+- 14.07
+- 15.05.1
+- 17.01.0-rc2
+- 17.01.7
+- 18.06.7
+- 19.07.1
