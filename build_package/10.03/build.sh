@@ -40,12 +40,13 @@ echo "building, logging at $PACKAGE_DIR_NAME/buildout.txt, please wait ..."
 
 cd $PACKAGE_DIR_NAME
 
-rm -f ../BUILD_ERROR
-make -j${NPROC} V=99 >buildout.txt 2>&1
+touch ../BUILD_ERROR
+make -j${NPROC} V=s >buildout.txt 2>&1
 ERR=$?
 if [ "${ERR}" -ne 0 ]
 then
-    make -j1 V=99 >buildout.txt 2>&1
+    # second check without parallel
+    make -j1 V=s >buildout.txt 2>&1
     ERR=$?
     if [ "${ERR}" -ne 0 ]
     then
@@ -53,3 +54,4 @@ then
         exit ${ERR}
     fi
 fi
+rm -f ../BUILD_ERROR
