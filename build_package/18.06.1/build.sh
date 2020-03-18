@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 #
 # config part
 #
@@ -7,6 +9,8 @@ DOWNLOAD_URL="https://github.com/openwrt/openwrt/archive/v18.06.1.tar.gz"
 PACKAGE_NAME="v18.06.1.tar.gz"
 PACKAGE_DIR_NAME="openwrt-18.06.1"
 CACHE_DL_TAR="18.06.1.dl.tar.gz"
+GIT_URL="https://github.com/openwrt/openwrt.git"
+GIT_TAG="tags/v18.06.1"
 
 #
 # global const
@@ -17,8 +21,15 @@ NPROC=`nproc --all`
 
 echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
-cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- 
-rm -rf $PACKAGE_DIR_NAME && tar -xf $STORING_DIR/$PACKAGE_NAME
+
+if [ -f "$CACHE_DIR/$PACKAGE_NAME" ]
+then
+	rm -rf $PACKAGE_DIR_NAME && tar -xf $CACHE_DIR/$PACKAGE_NAME -C .
+else
+	rm -rf openwrt && git clone ${GIT_URL}
+	rm -rf $PACKAGE_DIR_NAME && cd openwrt && git checkout $GIT_TAG && cd ~-
+	mv openwrt ${PACKAGE_DIR_NAME}
+fi
 
 #
 # patch and config
