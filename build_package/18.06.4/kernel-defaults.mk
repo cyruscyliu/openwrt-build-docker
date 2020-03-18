@@ -149,7 +149,7 @@ define Kernel/CompileImage/Initramfs
 	$(call Kernel/Configure/Initramfs)
 	$(CP) $(GENERIC_PLATFORM_DIR)/other-files/init $(TARGET_DIR)/init
 	rm -rf $(KERNEL_BUILD_DIR)/linux-$(LINUX_VERSION)/usr/initramfs_data.cpio*
-	+$(KERNEL_MAKE) $(if $(KERNELNAME),$(KERNELNAME),all) modules
+	+$(KERNEL_MAKE) $(if $(KERNELNAME),$(KERNELNAME),all) modules V=1 >$(KERNEL_BUILD_DIR)/makeout-initramfs.txt 2>&1
 	$(call Kernel/CopyImage,-initramfs)
 endef
 else
