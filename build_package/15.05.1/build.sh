@@ -17,7 +17,14 @@ NPROC=`nproc --all`
 
 echo "openwrt" | sudo -S chown -R openwrt:openwrt $PWD
 
-cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~-
+if [ -f "$CACHE_DIR/$PACKAGE_NAME" ]
+then
+    echo "using cached download source to accelerate"
+    cp "$CACHE_DIR/$PACKAGE_NAME" $STORING_DIR/
+else
+    cd $STORING_DIR && wget -nc $DOWNLOAD_URL && cd ~- 
+fi
+
 rm -rf $PACKAGE_DIR_NAME && tar xf $STORING_DIR/$PACKAGE_NAME >/dev/null 2>&1
 
 #
