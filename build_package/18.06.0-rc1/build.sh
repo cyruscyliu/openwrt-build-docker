@@ -1,16 +1,15 @@
 #!/bin/bash
 
-#set -x
 
 #
 # config part
 #
-DOWNLOAD_URL="https://github.com/openwrt/openwrt/archive/v18.06.1.tar.gz"
-PACKAGE_NAME="v18.06.1.tar.gz"
-PACKAGE_DIR_NAME="openwrt-18.06.1"
-CACHE_DL_TAR="18.06.1.dl.tar.gz"
+DOWNLOAD_URL="https://github.com/openwrt/openwrt/archive/v18.06.0-rc1.tar.gz"
+PACKAGE_NAME="v18.06.0-rc1.tar.gz"
+PACKAGE_DIR_NAME="openwrt-18.06.0-rc1"
+CACHE_DL_TAR="18.06.0-rc1.dl.tar.gz"
 GIT_URL="https://github.com/openwrt/openwrt.git"
-GIT_TAG="tags/v18.06.1"
+GIT_TAG="tags/v18.06.0-rc1"
 
 #
 # global const
@@ -30,6 +29,7 @@ else
 	rm -rf $PACKAGE_DIR_NAME && cd openwrt && git checkout $GIT_TAG && cd ~-
 	mv openwrt ${PACKAGE_DIR_NAME}
 fi
+
 
 #
 # patch and config
