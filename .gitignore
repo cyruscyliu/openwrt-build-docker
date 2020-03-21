@@ -12,14 +12,17 @@ firmadyne.openwrt.162.csv
 OpenWrt-ImageBuilder-*
 lede-imagebuilder-*
 openwrt-imagebuilder-*
-10.03-*
-12.09-*
-15.05-*
-17.01.0-rc1-*
-18.06.1-*
-18.06.4-*
-backfire_10.03
-chaos_calmer-15.05
-openwrt-17.01.0-rc1
-openwrt-18.06.4
+
+# this is commented as they use a too broad ignore pattern, pls make it more specific
+#10.03-*
+#12.09-*
+#15.05-*
+#17.01.0-rc1-*
+#18.06.1-*
+#18.06.4-*
+#backfire_10.03
+#chaos_calmer-15.05
+#openwrt-17.01.0-rc1
+#openwrt-18.06.4
+
 images

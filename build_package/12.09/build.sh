@@ -37,6 +37,7 @@ cp kernel-defaults.mk $target/include/kernel-defaults.mk
 cp kernel-config-extra $target/kernel-config-extra
 cp generic.mk $target/target/linux/orion/image/generic.mk
 cp Makefile $target/target/linux/ramips/image/Makefile
+cp 12.09-tools-upslug2-Makefile $targett/tools/upslug2/Makefile
 
 # feed dependency
 if [ -f "$CACHE_DIR/$CACHE_DL_TAR" ]
