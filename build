@@ -1,46 +1,10 @@
 #!/usr/bin/python
-"""
-We are going to build machines in machines.csv.
-"""
 import os
 import sys
 import hashlib
+import argparse
 from pyquery import PyQuery as pq
-
-OPENWRT_VERSIONS = ['18.06.4']
-INPUT = 'firmadyne.openwrt.27000.csv'
-
-
-def download_from_firmware_uuid():
-    # print('download firmadyne.openwrt.3400.csv from firmware-uuid')
-    # os.system('rm firmadyne.openwrt.3400.csv')
-    # os.system('wget https://raw.githubusercontent.com/cyruscyliu/firmware-uuid/master/firmadyne.openwrt.3400.csv')
-    print('use {} locally'.format(INPUT))
-
-
-def generate_machine_id_url():
-    header = None
-    records = []
-
-    with open(INPUT) as f:
-        for line in f:
-            items = line.strip().split(',')
-            if header is None:
-                header = items
-                continue
-            records.append(items)
-    machines = []
-    for record in records:
-        uuid = record[header.index('id')]
-        url = record[header.index('url')]
-        machines.append([uuid, url])
-
-    with open('machines.csv', 'w') as f:
-        f.write(','.join(['id', 'url']))
-        f.write('\n')
-        for machine in machines:
-            f.write(','.join(machine))
-            f.write('\n')
+from autobots_build import make_build_package
 
 
 def find_urls_in_openwrt_homepage(homepage):
@@ -61,19 +25,19 @@ def find_urls_in_openwrt_homepage(homepage):
     return image_builder, dot_config
 
 
-def build_hash_of_url_to_image_builder():
+def build_hash_of_url_to_image_builder(targets=None, versions=None):
     print('search for image builders')
     header = None
 
-    # read from image.builder.csv
+    # read from image.builder.cache
     cache_image_builder_table = {}
-    with open('image.builder.csv') as f:
+    with open('image_builder.cache') as f:
         for line in f:
             things = line.strip().split(',')
             cache_image_builder_table[things[1]] = things[2]
 
     image_builder_table = {}
-    with open('machines.csv') as f:
+    with open('id_urls.csv') as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
@@ -82,8 +46,18 @@ def build_hash_of_url_to_image_builder():
             uuid = items[header.index('id')]
             url = items[header.index('url')]
             openwrtver = url.split('/')[4]
-            if openwrtver not in OPENWRT_VERSIONS:
+            # skip unneeded ones
+            if versions is not None and openwrtver not in OPENWRT_VERSIONS:
                 continue
+            skip = True
+            if targets is not None:
+                for target in targets:
+                    if url.find(target) != -1:
+                        skip = False
+                        break
+            if skip:
+                continue
+            # find the image builder
             homepage = os.path.dirname(url)
             print('\tfind image builder in {}'.format(homepage))
             if homepage in cache_image_builder_table:
@@ -92,8 +66,9 @@ def build_hash_of_url_to_image_builder():
                 url_to_image_builder, _ = find_urls_in_openwrt_homepage(homepage)
                 cache_image_builder_table[homepage] = url_to_image_builder
             if url_to_image_builder is None:
-                print('cannot find the image builder, skip it')
+                print('cannot find the image builder in {}, skip it'.format(homepage)
                 continue
+            # update the image_builder_table
             hash_of_image_builder = hashlib.md5(url_to_image_builder.encode('utf-8'))
             if hash_of_image_builder.hexdigest() in image_builder_table:
                 # we also found many firmware share the same ImageBuilder
@@ -102,6 +77,14 @@ def build_hash_of_url_to_image_builder():
             else:
                 image_builder_table[hash_of_image_builder.hexdigest()] = \
                     {'homepage': homepage, 'url': url_to_image_builder, 'support': [uuid]}
+
+    # update image_builder.cache
+    with open('image_builder.cache', 'a') as f:
+        for k, v in image_builder_table.items():
+            if v['homepage'] in cache_image_builder_table:
+                continue
+            f.write('{},{},{},{}\n'.format(k, v['homepage'], v['url'], ','.join(v['support'])))
+
     return image_builder_table
 
 
@@ -236,92 +219,64 @@ def search(target=None):
             summary_by_uuid(uuid, k, id_urls[uuid], support_list[k])
 
 
-def build(target=None, ndib=False):
-    download_from_firmware_uuid()
-    generate_machine_id_url()
+def download_image_builder(url):
+    """Download the image builder to ./share."""
+    image_builder_name = \
+        os.path.basename(v['url']).replace('.tar.bz2', '').replace('.tar.xz', '')
+    config = os.path.join('share', image_builder_name, '.config')
 
-    # we found a .config always in an ImageBuilder
-    image_builder_table = build_hash_of_url_to_image_builder()
-    # save image_builder_table
-    with open('image.builder.csv', 'w') as f:
-        for k, v in image_builder_table.items():
-            f.write('{},{},{},{}\n'.format(k, v['homepage'], v['url'], ','.join(v['support'])))
+    if os.path.exists(config):
+        return config
 
-    # in this loop, prepare the building directory for every firmware
-    print('prepare the building directories')
+    # we don't trust the downloaded image builder which is maybe not complete
+    os.system('wget -nc {} -P share'.format(url))
+    if url.endswith('.tar.bz2'):
+        os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config >/dev/null 2>&1'.format(image_builder_name)
+    elif url.endswith('.tar.xz'):
+        os.system('cd share && tar Jxvf {0}.tar.xz {0}/.config >/dev/null 2>&1'.format(image_builder_name)
+    return config
+
+
+def build(targets, versions, update_only=False, prepare_only=False):
+    image_builder_table = \
+        build_hash_of_url_to_image_builder(targets, versions)
+    if update_only:
+        return None
+
     for k, v in image_builder_table.items():
         print('\t' + v['url'])
-        openwrtver = v['url'].split('/')[4]
-        if openwrtver not in OPENWRT_VERSIONS:
-            continue
-        hash = k
 
-        # 1. mkdir of this firmware (currently we use hash but each firmware a separate building dir,
-        # we need to do this in the 1st round & then check which can be merged later)
-        # name: openwrtver-hash
-        one_building_dir = '%s-%s' % (openwrtver, hash)
-        os.makedirs('share/%s' % one_building_dir, exist_ok=True)
+        # use autobots interface
+        openwrt_ver = v['url'].split('/')[4]
+        compile_script = make_compile_docker(openwrt_ver)
 
-        image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '').replace('.tar.xz', '')
-        config = os.path.join('share', image_builder_name, '.config')
-        fast = os.path.exists(config)
-
-        if target is not None:
-            if v['url'].find(target) != -1:
-                fast = False
-            else:
-                fast = True
-        if ndib:
-            fast = True
-
-        # 2. download the image_builder to ./share
-        if not fast:
-            os.system('wget -nc {} -P share'.format(v['url']))
-
-            # 3. extract .config from the image builder(tar.bz2) to the building dir
-            image_builder_name = os.path.basename(v['url']).replace('.tar.bz2', '').replace('.tar.xz', '')
-            if v['url'].endswith('.tar.bz2'):
-                os.system(
-                    'cd share && tar jxvf {0}.tar.bz2 {0}/.config >/dev/null 2>&1 && cp {0}/.config {1}/OpenWrt.config'.format(
-                        image_builder_name, one_building_dir))
-            elif v['url'].endswith('.tar.xz'):
-                os.system(
-                    'cd share && tar Jxvf {0}.tar.xz {0}/.config >/dev/null 2>&1 && cp {0}/.config {1}/OpenWrt.config'.format(
-                        image_builder_name, one_building_dir))
-
-        # 4. copy other things (patches to download.pl, makefiles, etc...)
-        if not os.path.exists('share/%s' % (openwrtver)):
-            print('warning: share/%s does not exist' % openwrtver)
-            continue
-
-        os.system('cp share/%s/* share/%s' % (openwrtver, one_building_dir))
-
-        # 5. build the machine in the specified docker (manually)
+        target_dir = 'share'
+        config_path = download_image_builder(v['url'])
+        build_dir = make_build_package(target_dir, openwrt_ver, config, tag=k)
+        if prepare_only:
+            return None
+        do_the_building(build_dir, compile_script)
 
 
 if __name__ == '__main__':
-    """
-    # update and download image builders
-    ./build
-    # update and don't download the image builders
-    ./build -ndib
-    # update the target and download the image builders
-    ./build -t ar71xx
-    # summary all
-    ./build -s
-    # summary one target
-    ./build -s -t oxnas
-    """
-    if len(sys.argv) == 2 and sys.argv[1] == '-s':
-        search()
-    elif len(sys.argv) == 2 and sys.argv[1] == '-ndib':
-        build(ndib=True)
-    elif len(sys.argv) == 3 and sys.argv[1] == '-t':
-        build(target=sys.argv[2])
-    elif len(sys.argv) == 4 and sys.argv[1] == '-s' and sys.argv[2] == '-t':
-        search(target=sys.argv[3])
-    elif len(sys.argv) == 1:
-        build()
-    else:
-        print('usage {} [-s] or [-ndib]'.format(sys.argv[0]))
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('-t', '--targets', nargs='*', 
+                                          help='select one target or targets to be built/summarized')
+    parser.add_argument('-v', '--versions', nargs='*', 
+                                          help='select one version or versions to be built/summarized')
+    parser.add_argument('-uo', '--update_only', action='store_true', default=False,
+                                          help='update the image builder cache only')
+    parser.add_argument('-po', '--prepare_only', action='store_true', default=True,
+                                          help='prepare the docker and the image builder only')
+    args = parser.parse_args()
+    
+    build(args.targets, args.versions, update_only=args.update_only, prepare_only=args.prepare_only)
+
+
+    # if len(sys.argv) == 2 and sys.argv[1] == '-s':
+        # search()
+    # elif len(sys.argv) == 4 and sys.argv[1] == '-s' and sys.argv[2] == '-t':
+        # search(target=sys.argv[3])
+    # else:
+        # print('usage {} [-s] or [-ndib]'.format(sys.argv[0]))
 
