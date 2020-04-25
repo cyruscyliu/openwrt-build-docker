@@ -14,6 +14,7 @@ lede-imagebuilder-*
 openwrt-imagebuilder-*
 10.03-*
 12.09-*
+14.07-*
 15.05-*
 17.01.0-rc1-*
 18.06.1-*
@@ -24,4 +25,6 @@ chaos_calmer-15.05
 openwrt-17.01.0-rc1
 openwrt-18.06.4
 openwrt-19.07.1
-
+machines.csv
+image.builder.csv
+core
