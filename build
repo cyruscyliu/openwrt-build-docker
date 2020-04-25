@@ -1,10 +1,74 @@
 #!/usr/bin/python
 import os
-import sys
 import hashlib
 import argparse
 from pyquery import PyQuery as pq
-from autobots_build import make_build_package
+from autobots_build import make_build_package, make_compile_docker
+
+
+def find_version_in_url(url):
+    items = url.split('/')
+
+    version = items[4]
+    if version in ['firmware', 'targets']:
+        return None
+    if version in [
+            '0.9', '1.1', '7.06', '7.07', '7.09',
+            '8.09', '8.09.1', '8.09.2', 'trunk']:
+        return None
+
+    return version
+    
+
+def find_versions():
+    versions = []
+
+    header = None
+    with open('id_urls.csv') as f:
+        for line in f:
+            items = line.strip().split(',')
+            if header is None:
+                header = items
+                continue
+            url = items[header.index('url')]
+            openwrtver = find_version_in_url(url)
+            if openwrtver is not None and openwrtver not in versions:
+                versions.append(openwrtver)
+    return sorted(versions)
+
+
+def find_target_in_url(url):
+    homepage = os.path.dirname(url)
+
+    items = homepage.split('/')
+    if len(items) < 6:
+        return None
+    target = items[5]
+    subtarget = None
+    if len(items) >= 7:
+        subtarget = items[6]
+
+    if target in ['targets']:
+        target = subtarget
+
+    return target
+
+
+def find_targets():
+    targets = []
+
+    header = None
+    with open('id_urls.csv') as f:
+        for line in f:
+            items = line.strip().split(',')
+            if header is None:
+                header = items
+                continue
+            url = items[header.index('url')]
+            target = find_target_in_url(url)
+            if target is not None and target not in targets:
+                targets.append(target)
+    return sorted(targets)
 
 
 def find_urls_in_openwrt_homepage(homepage):
@@ -35,6 +99,7 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
         for line in f:
             things = line.strip().split(',')
             cache_image_builder_table[things[1]] = things[2]
+    update_image_builder_table = []
 
     image_builder_table = {}
     with open('id_urls.csv') as f:
@@ -45,17 +110,12 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
                 continue
             uuid = items[header.index('id')]
             url = items[header.index('url')]
-            openwrtver = url.split('/')[4]
+            openwrtver = find_version_in_url(url)
             # skip unneeded ones
-            if versions is not None and openwrtver not in OPENWRT_VERSIONS:
+            if versions is not None and openwrtver not in versions:
                 continue
-            skip = True
-            if targets is not None:
-                for target in targets:
-                    if url.find(target) != -1:
-                        skip = False
-                        break
-            if skip:
+            target = find_target_in_url(url)
+            if targets is not None and target not in targets:
                 continue
             # find the image builder
             homepage = os.path.dirname(url)
@@ -65,8 +125,9 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
             else:
                 url_to_image_builder, _ = find_urls_in_openwrt_homepage(homepage)
                 cache_image_builder_table[homepage] = url_to_image_builder
+                update_image_builder_table.append(homepage)
             if url_to_image_builder is None:
-                print('cannot find the image builder in {}, skip it'.format(homepage)
+                print('cannot find the image builder in {}, skip it'.format(homepage))
                 continue
             # update the image_builder_table
             hash_of_image_builder = hashlib.md5(url_to_image_builder.encode('utf-8'))
@@ -81,9 +142,8 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
     # update image_builder.cache
     with open('image_builder.cache', 'a') as f:
         for k, v in image_builder_table.items():
-            if v['homepage'] in cache_image_builder_table:
-                continue
-            f.write('{},{},{},{}\n'.format(k, v['homepage'], v['url'], ','.join(v['support'])))
+            if v['homepage'] in update_image_builder_table:
+                f.write('{},{},{},{}\n'.format(k, v['homepage'], v['url'], ','.join(v['support'])))
 
     return image_builder_table
 
@@ -231,9 +291,9 @@ def download_image_builder(url):
     # we don't trust the downloaded image builder which is maybe not complete
     os.system('wget -nc {} -P share'.format(url))
     if url.endswith('.tar.bz2'):
-        os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config >/dev/null 2>&1'.format(image_builder_name)
+        os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config >/dev/null 2>&1'.format(image_builder_name))
     elif url.endswith('.tar.xz'):
-        os.system('cd share && tar Jxvf {0}.tar.xz {0}/.config >/dev/null 2>&1'.format(image_builder_name)
+        os.system('cd share && tar Jxvf {0}.tar.xz {0}/.config >/dev/null 2>&1'.format(image_builder_name))
     return config
 
 
@@ -259,11 +319,9 @@ def build(targets, versions, update_only=False, prepare_only=False):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('-t', '--targets', nargs='*', 
-                                          help='select one target or targets to be built/summarized')
-    parser.add_argument('-v', '--versions', nargs='*', 
-                                          help='select one version or versions to be built/summarized')
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('-t', '--targets', nargs='*', help=','.join(find_versions()))
+    parser.add_argument('-v', '--versions', nargs='*', help=','.join(find_targets()))
     parser.add_argument('-uo', '--update_only', action='store_true', default=False,
                                           help='update the image builder cache only')
     parser.add_argument('-po', '--prepare_only', action='store_true', default=True,
