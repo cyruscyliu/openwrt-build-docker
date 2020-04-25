@@ -7,8 +7,8 @@ import sys
 import hashlib
 from pyquery import PyQuery as pq
 
-OPENWRT_VERSIONS = ['18.06.4']
-INPUT = 'firmadyne.openwrt.27000.csv'
+OPENWRT_VERSIONS = ['14.07']
+INPUT = 'firmadyne.openwrt.37800.csv'
 
 
 def download_from_firmware_uuid():
