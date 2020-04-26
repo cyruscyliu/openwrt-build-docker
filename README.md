@@ -1,51 +1,51 @@
-# openwrt-build-docker
+# OpenWRT Build Docker
 
-Docker files for OpenWRT building envs.
+Docker files for the OpenWRT Project.
++ supports 10.03 14.07 15.05.1 17.01.0-rc1 17.01.1 17.01.3 17.01.5 17.01.7 18.06.0-rc1
+18.06.1 18.06.3 18.06.5 18.06.7 19.07.0-rc1 19.07.1 12.09 15.05 17.01.0 17.01.0-rc2
+17.01.2 17.01.4 17.01.6 18.06.0 18.06.0-rc2 18.06.2 18.06.4 18.06.6 19.07.0 19.07.0-rc2
++ working directory out:in docker openwrt-build-docker/share:/root/firmware
 
-+ for docker, the volume option should be `-v path/to/openwrt-build-docker/share:/root/firmware`
-+ for the first time, check [dependency](#dependency) and [flow](#flow)
+## Install
 
-## Usage
-
-
-## Summary
-```
-# csv
- 0    1    2      3        4              5             6         7        8         9    10  11
-uuid,hash,url,homepage,build_at,vmlinux_debug_info,source_code,vmlinux,dot_config,makeout,gcc,bin
-```
-
-### dependency
-
-0. Install `docker` if you don't have.
 ```bash
 apt-get install -y docker.io && pip install docker-compose==1.19.0 && \
     ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-```
-
-1. Install `python3.7` if you don't have.
-```bash
-add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt install -y python3.7 && \
-    apt install -y python3-pip && python3.7 -m pip install --upgrade pip
-```
-
-2. Install `virtualenv` if you don't have.
-```bash
-pip3.7 install virtualenv
-```
-
-3. Install pyquery in virtual python environment.
-```bash
-mkdir -p ./pyenv
-virtualenv -p `which python3.7` ./pyenv
-source pyenv/bin/activate
 pip install pyquery
 ```
+Download all the tar.gz files from this
+[link](https://drive.google.com/drive/folders/1KCdgytkYtWFmiXKlpb6nkqnoRGn9z9Ck?usp=sharing)
+and put them in `path/to/openwrt-build-docker/pre_download` folder.
 
-### acceleration
+## Usage
 
-Put them in `share` folder.
+You can select the OpenWRT revisions and targets you'd like to build by `-v` and `-t`.
+Neither `-v` nor `-t` is selected, we'll build all revisions and all targets. If you
+don't select `-rb`, then the real building process won't start, just for some simple tasks.
+If you select `-uo`, then nothing except the `image_builder.cache` where you can check
+where your build directories are will be updated.
+```bash
+./build -v 15.05 -t ramips -uo
+```
 
-+ [10.03.dl.tar.gz](https://drive.google.com/file/d/1S4TdLBQDgnVv2cifXMhSR1umo5_Bo2tu/view?usp=sharing)
-+ [12.09.dl.tar.gz](https://drive.google.com/open?id=1hc0PujRBhNEn_2zC8_etlGmVJAYHEq6Q)
-+ [15.05.dl.tar.gz](https://drive.google.com/file/d/1R86VpMVnaCLeb_iHCRAqkV_sSTc40-i-/view?usp=sharing)
+## As Library
+```python
+from autobots_build import make_build_package, \
+    make_compile_docker, do_the_building
+
+target_dir = 'share'
+openwrt_ver = '15.05'
+config_path =  'path/to/image/builder/config' # =target+subtarget
+tag = 'your_tag' # build_dir will be share/15.05-your_tag
+
+compile_script = make_compile_docker(openwrt_ver)
+build_dir = make_build_package(target_dir, openwrt_ver, config_path, tag=tag)
+do_the_building(build_dir, compile_script)
+```
+
+## Reference
+[autobots](https://github.com/occia/autobots), providing reusable APIs, DBs & knowledges based
+on collected firmware kernel data, AST & LLVM IR.  
+[docker-openwrt-buildroot](https://github.com/noonien/docker-openwrt-buildroot), a docker
+container for the OpenWRT buildroot.
+

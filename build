@@ -1,10 +1,75 @@
 #!/usr/bin/python
-import os
-import sys
-import hashlib
-import argparse
 from pyquery import PyQuery as pq
-from autobots_build import make_build_package
+from autobots_build import make_build_package, \
+    make_compile_docker, do_the_building
+import argparse
+import hashlib
+import os
+
+
+def find_version_in_url(url):
+    items = url.split('/')
+
+    version = items[4]
+    if version in ['firmware', 'targets']:
+        return None
+    if version in [
+            '0.9', '1.1', '7.06', '7.07', '7.09',
+            '8.09', '8.09.1', '8.09.2', 'trunk']:
+        return None
+
+    return version
+
+
+def find_versions():
+    versions = []
+
+    header = None
+    with open('image_builder.source') as f:
+        for line in f:
+            items = line.strip().split(',')
+            if header is None:
+                header = items
+                continue
+            url = items[header.index('url')]
+            openwrtver = find_version_in_url(url)
+            if openwrtver is not None and openwrtver not in versions:
+                versions.append(openwrtver)
+    return sorted(versions)
+
+
+def find_target_in_url(url):
+    homepage = os.path.dirname(url)
+
+    items = homepage.split('/')
+    if len(items) < 6:
+        return None
+    target = items[5]
+    subtarget = None
+    if len(items) >= 7:
+        subtarget = items[6]
+
+    if target in ['targets']:
+        target = subtarget
+
+    return target
+
+
+def find_targets():
+    targets = []
+
+    header = None
+    with open('image_builder.source') as f:
+        for line in f:
+            items = line.strip().split(',')
+            if header is None:
+                header = items
+                continue
+            url = items[header.index('url')]
+            target = find_target_in_url(url)
+            if target is not None and target not in targets:
+                targets.append(target)
+    return sorted(targets)
 
 
 def find_urls_in_openwrt_homepage(homepage):
@@ -26,7 +91,6 @@ def find_urls_in_openwrt_homepage(homepage):
 
 
 def build_hash_of_url_to_image_builder(targets=None, versions=None):
-    print('search for image builders')
     header = None
 
     # read from image.builder.cache
@@ -35,27 +99,22 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
         for line in f:
             things = line.strip().split(',')
             cache_image_builder_table[things[1]] = things[2]
+    update_image_builder_table = []
 
     image_builder_table = {}
-    with open('id_urls.csv') as f:
+    with open('image_builder.source') as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
                 header = items
                 continue
-            uuid = items[header.index('id')]
             url = items[header.index('url')]
-            openwrtver = url.split('/')[4]
+            openwrtver = find_version_in_url(url)
             # skip unneeded ones
-            if versions is not None and openwrtver not in OPENWRT_VERSIONS:
+            if versions is not None and openwrtver not in versions:
                 continue
-            skip = True
-            if targets is not None:
-                for target in targets:
-                    if url.find(target) != -1:
-                        skip = False
-                        break
-            if skip:
+            target = find_target_in_url(url)
+            if targets is not None and target not in targets:
                 continue
             # find the image builder
             homepage = os.path.dirname(url)
@@ -65,164 +124,29 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
             else:
                 url_to_image_builder, _ = find_urls_in_openwrt_homepage(homepage)
                 cache_image_builder_table[homepage] = url_to_image_builder
+                update_image_builder_table.append(homepage)
             if url_to_image_builder is None:
-                print('cannot find the image builder in {}, skip it'.format(homepage)
+                print('cannot find the image builder in {}, skip it'.format(homepage))
                 continue
             # update the image_builder_table
             hash_of_image_builder = hashlib.md5(url_to_image_builder.encode('utf-8'))
-            if hash_of_image_builder.hexdigest() in image_builder_table:
-                # we also found many firmware share the same ImageBuilder
-                # because they are downloaded from the same page
-                image_builder_table[hash_of_image_builder.hexdigest()]['support'].append(uuid)
-            else:
+            if not hash_of_image_builder.hexdigest() in image_builder_table:
                 image_builder_table[hash_of_image_builder.hexdigest()] = \
-                    {'homepage': homepage, 'url': url_to_image_builder, 'support': [uuid]}
+                    {'homepage': homepage, 'url': url_to_image_builder}
 
     # update image_builder.cache
     with open('image_builder.cache', 'a') as f:
         for k, v in image_builder_table.items():
-            if v['homepage'] in cache_image_builder_table:
-                continue
-            f.write('{},{},{},{}\n'.format(k, v['homepage'], v['url'], ','.join(v['support'])))
+            if v['homepage'] in update_image_builder_table:
+                f.write('{},{},{}\n'.format(k, v['homepage'], v['url']))
 
     return image_builder_table
-
-
-def update_support_list():
-    support_list = {}
-    for one_building_dir in os.listdir('share'):
-        full_path = os.path.join('share', one_building_dir)
-        if os.path.isfile(full_path):
-            continue
-        items = one_building_dir.split('-')
-        if len(items) == 3:
-            openwrtver = '-'.join(items[:2])
-        else:
-            openwrtver = items[0]
-        hash_of_image_builder = items[-1]
-        if openwrtver not in OPENWRT_VERSIONS:
-            continue
-        if not len(hash_of_image_builder):
-            continue
-        # fine makeout.txt
-        makeout = os.popen('cd {} && find -name makeout.txt'.format(full_path)).readlines()
-        # find vmlinux.elf-debug-info
-        vmlinux_debug_results = os.popen('cd {} && find -name vmlinux.elf-debug-info'.format(full_path)).readlines()
-        set_vmlinux_debug = set([os.path.dirname(path) for path in vmlinux_debug_results])
-        # find vmlinux
-        vmlinux_results = os.popen('cd {} && find -name vmlinux'.format(full_path)).readlines()
-        set_vmlinux = set([os.path.dirname(os.path.dirname(path)) for path in vmlinux_results])
-        target_dirs = set_vmlinux_debug & set_vmlinux
-        if not len(target_dirs):
-            continue
-        # find .config
-        dot_config_results = os.popen('cd {} && find -name .config'.format(full_path)).readlines()
-        set_config = set([os.path.dirname(os.path.dirname(path)) for path in dot_config_results])
-        target_dirs = target_dirs & set_config
-        if not len(target_dirs):
-            continue
-        # fill in support list
-        support_list[hash_of_image_builder] = {}
-        target_dir = list(target_dirs)[0]
-        # vmlinux.elf-debug-info
-        for path in vmlinux_debug_results:
-            if os.path.dirname(path) == target_dir:
-                support_list[hash_of_image_builder]['path_to_vmlinux_debug_info'] = \
-                    os.path.join(full_path, path.strip())
-        # source code
-        for path in vmlinux_results:
-            if os.path.dirname(os.path.dirname(path)) == target_dir and os.path.basename(
-                    os.path.dirname(path)).find('linux') != -1:
-                support_list[hash_of_image_builder]['path_to_source_code'] = \
-                    os.path.join(full_path, os.path.dirname(path.strip()))
-                support_list[hash_of_image_builder]['path_to_vmlinux'] = os.path.join(full_path, path.strip())
-                support_list[hash_of_image_builder]['path_to_dot_config'] = \
-                    os.path.join(full_path, os.path.join(os.path.dirname(path.strip()), '.config'))
-        # makeout
-        if len(makeout):
-            support_list[hash_of_image_builder]['path_to_makeout'] = os.path.join(full_path, makeout[0].strip())
-        print('\tupdate support list for {}'.format(full_path))
-    return support_list
-
-
-def summary_by_uuid(uuid, hash_of_image_builder, url, support_list):
-    info = [uuid, hash_of_image_builder, url]
-    # 0/1/2
-
-    openwrtver = url.split('/')[4]
-    homepage = os.path.dirname(url)
-    info.append(homepage)
-    # 3
-
-    build_at = "share/{}-{}".format(openwrtver, hash_of_image_builder)
-    info.append(build_at)
-    # 4
-
-    # find path to vmlinux and path to source code
-    for i in ['path_to_vmlinux_debug_info', 'path_to_source_code',
-              'path_to_vmlinux', 'path_to_dot_config', 'path_to_makeout']:
-        # 5/6/7/8/9
-        if i in support_list:
-            v = support_list[i]
-            info.append(v)
-        else:
-            info.append('')
-
-    gcc_results = os.popen('cd {} && find -name *-openwrt-linux-gcc'.format(build_at)).readlines()
-    # 10
-    if len(gcc_results):
-        path_to_gcc = os.path.join(build_at, gcc_results[0].strip())
-        info.append(path_to_gcc)
-    else:
-        info.append('')
-
-    binary = os.path.basename(url)
-    binary_results = os.popen('cd {} && find -name {}'.format(build_at, binary)).readlines()
-    # 11
-    if len(binary_results):
-        path_to_binary = os.path.join(build_at, binary_results[0].strip())
-        info.append(path_to_binary)
-    else:
-        info.append('')
-
-    with open('summary/{}.summary'.format(uuid), 'w') as f:
-        f.write(','.join(info))
-    print('\tsummary at summary/{}.summary'.format(uuid))
-
-
-def search(target=None):
-    print('update summary')
-    # first, update support list
-    support_list = update_support_list()
-
-    # read from image.builder.csv
-    image_builder_table = {}
-    with open('image.builder.csv') as f:
-        for line in f:
-            things = line.strip().split(',')
-            if target is not None and things[2].find(target) == -1:
-                continue
-            image_builder_table[things[0]] = {'url': things[2], 'support': things[3:]}
-
-    # read from machines.csv
-    id_urls = {}
-    with open('machines.csv') as f:
-        for line in f:
-            things = line.strip().split(',')
-            id_urls[things[0]] = things[1]
-
-    for k, v in image_builder_table.items():
-        if k not in support_list:
-            print('\tcan not support {} {} {}'.format(k, v['url'], v['support']))
-            continue
-        for uuid in v['support']:
-            summary_by_uuid(uuid, k, id_urls[uuid], support_list[k])
 
 
 def download_image_builder(url):
     """Download the image builder to ./share."""
     image_builder_name = \
-        os.path.basename(v['url']).replace('.tar.bz2', '').replace('.tar.xz', '')
+        os.path.basename(url.replace('.tar.bz2', '').replace('.tar.xz', ''))
     config = os.path.join('share', image_builder_name, '.config')
 
     if os.path.exists(config):
@@ -231,13 +155,13 @@ def download_image_builder(url):
     # we don't trust the downloaded image builder which is maybe not complete
     os.system('wget -nc {} -P share'.format(url))
     if url.endswith('.tar.bz2'):
-        os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config >/dev/null 2>&1'.format(image_builder_name)
+        os.system('cd share && tar jxvf {0}.tar.bz2 {0}/.config >/dev/null 2>&1'.format(image_builder_name))
     elif url.endswith('.tar.xz'):
-        os.system('cd share && tar Jxvf {0}.tar.xz {0}/.config >/dev/null 2>&1'.format(image_builder_name)
+        os.system('cd share && tar Jxvf {0}.tar.xz {0}/.config >/dev/null 2>&1'.format(image_builder_name))
     return config
 
 
-def build(targets, versions, update_only=False, prepare_only=False):
+def build(targets, versions, update_only=False, really_build=False):
     image_builder_table = \
         build_hash_of_url_to_image_builder(targets, versions)
     if update_only:
@@ -252,31 +176,21 @@ def build(targets, versions, update_only=False, prepare_only=False):
 
         target_dir = 'share'
         config_path = download_image_builder(v['url'])
-        build_dir = make_build_package(target_dir, openwrt_ver, config, tag=k)
-        if prepare_only:
-            return None
-        do_the_building(build_dir, compile_script)
+        build_dir = make_build_package(target_dir, openwrt_ver, config_path, tag=k)
+        print('\t', build_dir)
+        if really_build:
+            do_the_building(build_dir, compile_script)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('-t', '--targets', nargs='*', 
-                                          help='select one target or targets to be built/summarized')
-    parser.add_argument('-v', '--versions', nargs='*', 
-                                          help='select one version or versions to be built/summarized')
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('-v', '--versions', nargs='*', help=','.join(find_versions()))
+    parser.add_argument('-t', '--targets', nargs='*', help=','.join(find_targets()))
     parser.add_argument('-uo', '--update_only', action='store_true', default=False,
                                           help='update the image builder cache only')
-    parser.add_argument('-po', '--prepare_only', action='store_true', default=True,
-                                          help='prepare the docker and the image builder only')
+    parser.add_argument('-rb', '--really_build', action='store_true', default=False,
+                                          help='really build the openwrt project')
     args = parser.parse_args()
-    
-    build(args.targets, args.versions, update_only=args.update_only, prepare_only=args.prepare_only)
 
-
-    # if len(sys.argv) == 2 and sys.argv[1] == '-s':
-        # search()
-    # elif len(sys.argv) == 4 and sys.argv[1] == '-s' and sys.argv[2] == '-t':
-        # search(target=sys.argv[3])
-    # else:
-        # print('usage {} [-s] or [-ndib]'.format(sys.argv[0]))
+    build(args.targets, args.versions, update_only=args.update_only, really_build=args.really_build)
 
