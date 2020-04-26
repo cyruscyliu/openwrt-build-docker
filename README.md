@@ -2,7 +2,10 @@
 
 Docker files for the OpenWRT Project.
 
-+ docker volume `-v path/to/openwrt-build-docker/share:/root/firmware`
++ supports 10.03 14.07 15.05.1 17.01.0-rc1 17.01.1 17.01.3 17.01.5 17.01.7 18.06.0-rc1
+18.06.1 18.06.3 18.06.5 18.06.7 19.07.0-rc1 19.07.1 12.09 15.05 17.01.0 17.01.0-rc2
+17.01.2 17.01.4 17.01.6 18.06.0 18.06.0-rc2 18.06.2 18.06.4 18.06.6 19.07.0 19.07.0-rc2
++ working directory out:in docker openwrt-build-docker/share:/root/firmware`
 
 ## Install
 
