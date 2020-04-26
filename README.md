@@ -9,21 +9,8 @@ Docker files for the OpenWRT Project.
 ## Install
 
 ```bash
-# Install `docker` if you don't have.
 apt-get install -y docker.io && pip install docker-compose==1.19.0 && \
     ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-
-# Install `python3.7` if you don't have.
-add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt install -y python3.7 && \
-    apt install -y python3-pip && python3.7 -m pip install --upgrade pip
-
-# Install `virtualenv` if you don't have.
-pip3.7 install virtualenv
-
-# Install pyquery in virtual python environment.
-mkdir -p ./pyenv
-virtualenv -p `which python3.7` ./pyenv
-source pyenv/bin/activate
 pip install pyquery
 ```
 Download all the tar.gz files from this
@@ -35,8 +22,10 @@ and put them in `path/to/openwrt-build-docker/pre_download` folder.
 You can select the OpenWRT revisions and targets you'd like to build by `-v` and `-t`.
 Neither `-v` nor `-t` is selected, we'll build all revisions and all targets. If you
 don't select `-rb`, then the real building process won't start, just for some simple tasks.
+If you select `-uo`, then nothing except the `image_builder.cache` where you can check
+where your build directories are will be updated.
 ```bash
-./build -v 15.05 -t ramips -rb
+./build -v 15.05 -t ramips -uo
 ```
 
 ## Reference
