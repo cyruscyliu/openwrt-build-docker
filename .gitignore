@@ -11,4 +11,4 @@ pyenv
 *.zip
 *-*
 *_*
-!image_builder.cache
+!image_builder.*

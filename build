@@ -25,7 +25,7 @@ def find_versions():
     versions = []
 
     header = None
-    with open('id_urls.csv') as f:
+    with open('image_builder.url') as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
@@ -59,7 +59,7 @@ def find_targets():
     targets = []
 
     header = None
-    with open('id_urls.csv') as f:
+    with open('image_builder.url') as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
@@ -102,13 +102,12 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
     update_image_builder_table = []
 
     image_builder_table = {}
-    with open('id_urls.csv') as f:
+    with open('image_builder.url') as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
                 header = items
                 continue
-            uuid = items[header.index('id')]
             url = items[header.index('url')]
             openwrtver = find_version_in_url(url)
             # skip unneeded ones
@@ -131,19 +130,15 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
                 continue
             # update the image_builder_table
             hash_of_image_builder = hashlib.md5(url_to_image_builder.encode('utf-8'))
-            if hash_of_image_builder.hexdigest() in image_builder_table:
-                # we also found many firmware share the same ImageBuilder
-                # because they are downloaded from the same page
-                image_builder_table[hash_of_image_builder.hexdigest()]['support'].append(uuid)
-            else:
+            if not hash_of_image_builder.hexdigest() in image_builder_table:
                 image_builder_table[hash_of_image_builder.hexdigest()] = \
-                    {'homepage': homepage, 'url': url_to_image_builder, 'support': [uuid]}
+                    {'homepage': homepage, 'url': url_to_image_builder}
 
     # update image_builder.cache
     with open('image_builder.cache', 'a') as f:
         for k, v in image_builder_table.items():
             if v['homepage'] in update_image_builder_table:
-                f.write('{},{},{},{}\n'.format(k, v['homepage'], v['url'], ','.join(v['support'])))
+                f.write('{},{},{}\n'.format(k, v['homepage'], v['url']))
 
     return image_builder_table
 
@@ -189,8 +184,8 @@ def build(targets, versions, update_only=False, really_build=False):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('-t', '--targets', nargs='*', help=','.join(find_versions()))
-    parser.add_argument('-v', '--versions', nargs='*', help=','.join(find_targets()))
+    parser.add_argument('-v', '--versions', nargs='*', help=','.join(find_versions()))
+    parser.add_argument('-t', '--targets', nargs='*', help=','.join(find_targets()))
     parser.add_argument('-uo', '--update_only', action='store_true', default=False,
                                           help='update the image builder cache only')
     parser.add_argument('-rb', '--really_build', action='store_true', default=False,
