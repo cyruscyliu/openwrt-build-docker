@@ -22,7 +22,7 @@ def generate_image_url(path):
         url = record[header.index('url')]
         urls.append(url)
 
-    with open('image_builder.url', 'w') as f:
+    with open('image_builder.source', 'w') as f:
         f.write('url\n')
         for url in urls:
             f.write('{}\n'.format(url))

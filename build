@@ -25,7 +25,7 @@ def find_versions():
     versions = []
 
     header = None
-    with open('image_builder.url') as f:
+    with open('image_builder.source') as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
@@ -59,7 +59,7 @@ def find_targets():
     targets = []
 
     header = None
-    with open('image_builder.url') as f:
+    with open('image_builder.source') as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
@@ -102,7 +102,7 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
     update_image_builder_table = []
 
     image_builder_table = {}
-    with open('image_builder.url') as f:
+    with open('image_builder.source') as f:
         for line in f:
             items = line.strip().split(',')
             if header is None:
