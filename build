@@ -1,10 +1,10 @@
 #!/usr/bin/python
-import os
-import hashlib
-import argparse
 from pyquery import PyQuery as pq
 from autobots_build import make_build_package, \
     make_compile_docker, do_the_building
+import argparse
+import hashlib
+import os
 
 
 def find_version_in_url(url):
@@ -148,114 +148,6 @@ def build_hash_of_url_to_image_builder(targets=None, versions=None):
     return image_builder_table
 
 
-def summary_makeout(build_dir):
-    makeout = os.popen('cd {} && find -name makeout.txt'.format(build_dir)).readlines()
-    if len(makeout):
-        return os.path.join(build_dir, makeout[0].strip())
-    return None
-
-
-def summary_source_code(build_dir):
-    # find vmlinux.elf-debug-info
-    vmlinux_debug_results = os.popen(
-        'cd {} && find -name vmlinux.elf-debug-info'.format(build_dir)).readlines()
-    set_vmlinux_debug = set([os.path.dirname(path) for path in vmlinux_debug_results])
-    # find vmlinux
-    vmlinux_results = os.popen(
-        'cd {} && find -name vmlinux'.format(build_dir)).readlines()
-    set_vmlinux = set([os.path.dirname(os.path.dirname(path)) for path in vmlinux_results])
-    target_dirs = set_vmlinux_debug & set_vmlinux
-    if not len(target_dirs):
-        return None
-    # find .config
-    dot_config_results = os.popen(
-        'cd {} && find -name .config'.format(build_dir)).readlines()
-    set_config = set([os.path.dirname(os.path.dirname(path)) for path in dot_config_results])
-    target_dirs = target_dirs & set_config
-    if not len(target_dirs):
-        return None
-    # fill in support list
-    target_dir = list(target_dirs)[0]
-    # vmlinux.elf-debug-info
-    for path in vmlinux_debug_results:
-        if os.path.dirname(path) == target_dir:
-            path_to_vmlinux_debug_info = os.path.join(build_dir, path.strip())
-    # source code
-    for path in vmlinux_results:
-        if os.path.dirname(os.path.dirname(path)) == target_dir and os.path.basename(
-                os.path.dirname(path)).find('linux') != -1:
-            path_to_source_code = os.path.join(build_dir, os.path.dirname(path.strip()))
-            path_to_vmlinux = os.path.join(build_dir, path.strip())
-            path_to_dot_config = os.path.join(build_dir, os.path.join(os.path.dirname(path.strip()), '.config'))
-    return [path_to_vmlinux_debug_info, path_to_source_code, path_to_vmlinux, path_to_dot_config]
-
-
-def summary_by_uuid(uuid, openwrt_ver, hash_of_image_builder):
-    summary = os.path.join('summary', '{}.summary'.format(uuid))
-    if os.path.exists(summary):
-        print('\tsummary at summary/{}.summary'.format(uuid))
-        return None
-
-    info = [uuid, hash_of_image_builder, '', '']
-    # 0/1/2/3
-
-    build_dir = "share/{}-{}".format(openwrt_ver, hash_of_image_builder)
-    info.append(build_dir)
-    # 4
-
-    source_code = summary_source_code(build_dir)
-    if source_code is None:
-        print('fail to summarize source code')
-        return None
-    info.extend(source_code)
-    # 5/6/7/8
-
-    makeout = summary_makeout(build_dir)
-    if makeout is None:
-        print('fail to summarize makeout.txt')
-        return None
-    info.append(makeout)
-    # 9
-
-    gcc_results = os.popen(
-        'cd {} && find -name *-openwrt-linux-gcc'.format(build_dir)).readlines()
-    if len(gcc_results):
-        path_to_gcc = os.path.join(build_dir, gcc_results[0].strip())
-        info.append(path_to_gcc)
-    else:
-        info.append('')
-    # 10
-
-    # binary = os.path.basename(url)
-    # binary_results = os.popen(
-    #     'cd {} && find -name {}'.format(build_dir, binary)).readlines()
-    # if len(binary_results):
-    #     path_to_binary = os.path.join(build_dir, binary_results[0].strip())
-    #     info.append(path_to_binary)
-    # else:
-    #     info.append('')
-    info.append('')
-    # 11
-
-    with open('summary/{}.summary'.format(uuid), 'w') as f:
-        f.write(','.join(info))
-    print('\tsummary at summary/{}.summary'.format(uuid))
-
-
-def summary():
-    # read from image.builder.cache
-    image_builder_table = {}
-    with open('image_builder.cache') as f:
-        for line in f:
-            things = line.strip().split(',')
-            image_builder_table[things[0]] = {'url': things[2], 'support': things[3:]}
-
-    for k, v in image_builder_table.items():
-        for uuid in v['support']:
-            openwrt_ver = find_version_in_url(v['url'])
-            summary_by_uuid(uuid, openwrt_ver, k)
-
-
 def download_image_builder(url):
     """Download the image builder to ./share."""
     image_builder_name = \
@@ -297,8 +189,6 @@ def build(targets, versions, update_only=False, really_build=False):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('-s', '--summary', action='store_true', default=False,
-                                          help='summary all')
     parser.add_argument('-t', '--targets', nargs='*', help=','.join(find_versions()))
     parser.add_argument('-v', '--versions', nargs='*', help=','.join(find_targets()))
     parser.add_argument('-uo', '--update_only', action='store_true', default=False,
@@ -307,8 +197,5 @@ if __name__ == '__main__':
                                           help='really build the openwrt project')
     args = parser.parse_args()
 
-    if args.summary:
-        summary()
-    else:
-        build(args.targets, args.versions, update_only=args.update_only, really_build=args.really_build)
+    build(args.targets, args.versions, update_only=args.update_only, really_build=args.really_build)
 
