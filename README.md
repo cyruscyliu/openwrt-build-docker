@@ -28,6 +28,21 @@ where your build directories are will be updated.
 ./build -v 15.05 -t ramips -uo
 ```
 
+## As Library
+```python
+from autobots_build import make_build_package, \
+    make_compile_docker, do_the_building
+
+target_dir = 'share'
+openwrt_ver = '15.05'
+config_path =  'path/to/image/builder/config' # =target+subtarget
+tag = 'your_tag' # build_dir will be share/15.05-your_tag
+
+compile_script = make_compile_docker(openwrt_ver)
+build_dir = make_build_package(target_dir, openwrt_ver, config_path, tag=tag)
+do_the_building(build_dir, compile_script)
+```
+
 ## Reference
 [autobots](https://github.com/occia/autobots), providing reusable APIs, DBs & knowledges based
 on collected firmware kernel data, AST & LLVM IR.  
