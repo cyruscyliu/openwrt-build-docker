@@ -12,3 +12,4 @@ pyenv
 *-*
 *_*
 !image_builder.*
+*.yaml
