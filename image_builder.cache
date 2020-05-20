@@ -4,3 +4,5 @@
 2529f54b83692eebb2a9a9db2ef50ae6,http://archive.openwrt.org/chaos_calmer/15.05/ramips/rt305x,http://archive.openwrt.org/chaos_calmer/15.05/ramips/rt305x/OpenWrt-ImageBuilder-15.05-ramips-rt305x.Linux-x86_64.tar.bz2
 a8e2557b42771c5d32da2192a9593a98,http://archive.openwrt.org/chaos_calmer/15.05/ramips/mt7628,http://archive.openwrt.org/chaos_calmer/15.05/ramips/mt7628/OpenWrt-ImageBuilder-15.05-ramips-mt7628.Linux-x86_64.tar.bz2
 ade8e4a86acb7d97201ef5d25d701279,http://archive.openwrt.org/chaos_calmer/15.05/ramips/mt7621,http://archive.openwrt.org/chaos_calmer/15.05/ramips/mt7621/OpenWrt-ImageBuilder-15.05-ramips-mt7621.Linux-x86_64.tar.bz2
+931ae580ba37bfa1da79c4c516896e40,http://archive.openwrt.org/releases/19.07.1/targets/ath79/tiny,http://archive.openwrt.org/releases/19.07.1/targets/ath79/tiny/openwrt-imagebuilder-19.07.1-ath79-tiny.Linux-x86_64.tar.xz
+89494294f998e62c0784f215d25eae64,http://archive.openwrt.org/releases/19.07.1/targets/ath79/generic,http://archive.openwrt.org/releases/19.07.1/targets/ath79/generic/openwrt-imagebuilder-19.07.1-ath79-generic.Linux-x86_64.tar.xz
