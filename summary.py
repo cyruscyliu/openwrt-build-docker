@@ -44,6 +44,12 @@ def worker(hash_of_image_builder, openwrtver, full_path):
         print('[-] ignore unexpected .config pattern in {}'.format(
             full_path))
         return
+    
+    gcc = os.popen(
+        'cd {} && find -name *-openwrt-linux-gcc'.format(full_path)).readlines()
+    if len(gcc) > 0:
+        support_list['path_to_gcc'] = \
+            os.path.join(full_path, gcc[0].strip())
 
     # fill in support list
     target_dir = list(target_dirs)[0]
@@ -64,7 +70,6 @@ def worker(hash_of_image_builder, openwrtver, full_path):
             support_list['path_to_dot_config'] = \
                 os.path.join(full_path, os.path.join(
                     os.path.dirname(path.strip()), '.config'))
-    # makeout
     yaml.safe_dump(
         support_list, open('.{}.yaml'.format(hash_of_image_builder), 'w'))
     print('[+] update support list for {}'.format(full_path))
