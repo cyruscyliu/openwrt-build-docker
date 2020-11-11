@@ -10,14 +10,12 @@ We support automatically building the OpenWrt project given a target/subtarget.
 ```bash
 apt-get install -y docker.io && pip install docker-compose==1.19.0 && \
     ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-pip install pyquery
 ```
 
 ## Usage
 
 ```
 ./openwrt defconfig/firmguide.batch -o firmguide.log
-
 ```
 
 ## Trouble shooting
@@ -30,13 +28,13 @@ pip install pyquery
 
 ## Currently supports
 
-After testing all the 1400+ building configs, there are maybe 100-300 configs failed.
+After testing all the 1400+ building configs, there are maybe 100-300 configs failed.  
 We follow the following rules to fix them.
 - lowest priority, any other things for the research could preempt this
 - lazy, we will fix the failing build that really stops us
 - open, your contribution is very welcome and highly appreciated ;)
 
-+ Table 1. the progress (supp/all) for all the latest versions for all target.subtarget.
+### Table 1. the progress (supp/all) for all the latest versions for all target.subtarget.
 
 |      latest version     | latest | oldest | middle |  all  |
 |:-----------------------:|:------:|:------:|:------:|:-----:|
@@ -49,7 +47,7 @@ We follow the following rules to fix them.
 |          12.09          | 7/10   | 11/16  |  6/10  | 24/36 |
 |          10.03          | 3/3    | 14/14  |  0/0   | 17/17 |
 
-+ Table 2. the progress (supp/all) for all the versions for all target.subtarget
+### Table 2. the progress (supp/all) for all the versions for all target.subtarget
 
 |       version        | all (supp/all) |
 |:--------------------:|:--------------:|
@@ -84,9 +82,9 @@ We follow the following rules to fix them.
 |  openwrt-19.07.1     |      53/56     |
 |      summary         |    166/1428    |
 
-+ Table 3. Detailed progress for every target.subtarget.
+### Table 3. Detailed progress for every target.subtarget.
 
-Please check [detailed-progress-table](./latest-process.md) 
+Please check [detailed-progress-table](./latest-progress.md) 
 
 ## License
 
