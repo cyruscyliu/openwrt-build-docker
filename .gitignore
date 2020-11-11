@@ -9,7 +9,8 @@ pyenv
 *.tar.gz
 *.tar.bz2
 *.zip
-*-*
-*_*
 !image_builder.*
 *.yaml
+
+# packages
+openwrt_config_database

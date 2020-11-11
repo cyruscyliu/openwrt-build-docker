@@ -1,0 +1,17 @@
+^backfire_10.03$ ^adm5120$ ^router_be$
+^backfire_10.03$ ^adm5120$ ^router_le$
+^backfire_10.03$ ^ar7$ ^generic$
+^backfire_10.03$ ^ar71xx$ ^generic$
+^backfire_10.03$ ^atheros$ ^generic$
+^backfire_10.03$ ^au1000$ ^au1500$
+^backfire_10.03$ ^brcm-2.4$ ^generic$
+^backfire_10.03$ ^brcm47xx$ ^generic$
+^backfire_10.03$ ^brcm63xx$ ^generic$
+^backfire_10.03$ ^cobalt$ ^generic$
+^backfire_10.03$ ^ifxmips$ ^generic$
+^backfire_10.03$ ^ixp4xx$ ^generic$
+^backfire_10.03$ ^kirkwood$ ^generic$
+^backfire_10.03$ ^octeon$ ^generic$
+^backfire_10.03$ ^orion$ ^generic$
+^backfire_10.03$ ^rb532$ ^generic$
+^backfire_10.03$ ^xburst$ ^qi_lb60$
