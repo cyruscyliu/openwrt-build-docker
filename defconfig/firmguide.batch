@@ -1,0 +1,5 @@
+.*archive-15.05.* ^ramips$ ^rt3883$
+.*archive-15.05.* ^oxnas$ ^generic$
+.*archive-15.05.* ^bcm53xx$ ^generic$
+.*archive-15.05.* ^kirkwood$ ^generic$
+.*openwrt-19.07.1.* ^ath79$ ^generic$
