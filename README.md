@@ -1,9 +1,7 @@
 # OpenWRT Build Docker
 
-Docker files for the OpenWRT Project.
-We support automatically building the OpenWrt project given a target/subtarget.
-
-+ working directory out:in docker openwrt-build-docker/share:/root/firmware
+we support automatically building the OpenWrt project 
+given a target/subtarget of a specific OpenWrt revision.
 
 ## Install
 
@@ -15,6 +13,12 @@ apt-get install -y docker.io && pip install docker-compose==1.19.0 && \
 ## Usage
 
 ```
+# cat defconfig/firmware.batch
+# .*archive-15.05.* ^ramips$ ^rt3883$
+# .*archive-15.05.* ^oxnas$ ^generic$
+# .*archive-15.05.* ^bcm53xx$ ^generic$
+# .*archive-15.05.* ^kirkwood$ ^generic$
+# .*openwrt-19.07.1.* ^ath79$ ^generic$
 ./openwrt defconfig/firmguide.batch -o firmguide.log
 ```
 
