@@ -140,7 +140,7 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--skip_build", dest="skipbuild", default=False,
                       help="test but skip the build process", action="store_true")
     parser.add_argument("-o", "--logout", dest="logfile", default=None,
-                      help="log file, by default the stdout")
+                      help="append log file, by default stdout")
     options = parser.parse_args()
 
     if options.skipbuild:

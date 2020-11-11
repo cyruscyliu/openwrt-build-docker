@@ -5,8 +5,8 @@ import os
 from pathlib import Path
 from datetime import datetime
 
-# this should be changed if we are used as a runtime imported library
-WORK_BASE = '.'
+
+WORK_BASE = 'packages'
 COMPILE_PKG_PATH = WORK_BASE + '/compile_package'
 BUILD_PKG_PATH = WORK_BASE + '/build_package'
 
