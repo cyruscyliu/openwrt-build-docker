@@ -1,53 +1,47 @@
-# OpenWRT Build Docker
+# OpenWrt Build Docker
 
-Docker files for the OpenWRT Project.
-+ supports 10.03 14.07 15.05.1 17.01.0-rc1 17.01.1 17.01.3 17.01.5 17.01.7 18.06.0-rc1
-18.06.1 18.06.3 18.06.5 18.06.7 19.07.0-rc1 19.07.1 12.09 15.05 17.01.0 17.01.0-rc2
-17.01.2 17.01.4 17.01.6 18.06.0 18.06.0-rc2 18.06.2 18.06.4 18.06.6 19.07.0 19.07.0-rc2
-+ working directory out:in docker openwrt-build-docker/share:/root/firmware
+We support automatically building the OpenWrt project given a target/subtarget
+of a specific OpenWrt revision. We now support OpenWrt from 10.03 to 19.07.1.
+Please check [progress-summary](./progress-summary.md) for more information.
 
 ## Install
 
 ```bash
 apt-get install -y docker.io && pip install docker-compose==1.19.0 && \
     ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-pip install pyquery
 ```
-Download all the tar.gz files from this
-[link](https://drive.google.com/drive/folders/1KCdgytkYtWFmiXKlpb6nkqnoRGn9z9Ck?usp=sharing)
-and put them in `path/to/openwrt-build-docker/pre_download` folder.
+
+Then, download all [the OpenWrt download
+packages](https://drive.google.com/drive/folders/1KCdgytkYtWFmiXKlpb6nkqnoRGn9z9Ck),
+or one of them you need, and put them into the `./pre_download` directory for
+sake of saving time.
 
 ## Usage
 
-You can select the OpenWRT revisions and targets you'd like to build by `-v` and `-t`.
-Neither `-v` nor `-t` is selected, we'll build all revisions and all targets. If you
-don't select `-rb`, then the real building process won't start, just for some simple tasks.
-If you select `-uo`, then nothing except the `image_builder.cache` where you can check
-where your build directories are will be updated.
+This project works on a batch of descriptions in a batch file. Having loaded the
+batch file, a target/subtarget of a specific OpenWrt revision will be built
+automatically. Each descrition of a batch file should have three elements,
+`REVESION TARGET SUBTARGET`. Each element can be constant string or regular
+expression. Here is an example.
+
+``` bash
+$ cat defconfig/example.batch
+^archive-15.05$ ^oxnas$ ^generic$
+```
+
+After writing down your batch file, one line command is enough to build all of
+descriptions.
+
 ```bash
-./build -v 15.05 -t ramips -uo
+./openwrt.py defconfig/example.batch -o example.log
 ```
 
-## As Library
-```python
-from autobots_build import make_build_package, \
-    make_compile_docker, do_the_building
-
-target_dir = 'share'
-openwrt_ver = '15.05'
-config_path =  'path/to/image/builder/config' # =target+subtarget
-tag = 'your_tag' # build_dir will be share/15.05-your_tag
-
-compile_script = make_compile_docker(openwrt_ver)
-build_dir = make_build_package(target_dir, openwrt_ver, config_path, tag=tag)
-do_the_building(build_dir, compile_script)
-```
-
-## Reference
-[autobots](https://github.com/occia/autobots), providing reusable APIs, DBs & knowledges based
-on collected firmware kernel data, AST & LLVM IR.  
-[docker-openwrt-buildroot](https://github.com/noonien/docker-openwrt-buildroot), a docker
-container for the OpenWRT buildroot.
+If you want to handle building errors and rebuild manually, you need to go to
+the corresponding build directory, for example,
+`build/15.05-archive-15.05-oxnas-generic-OLDEST`, to maybe modify
+`docker-compose.yml` and `build.sh`, and finally to run `./re_compile.sh`.
+Please note that `./re_compile.sh` will clean the previous builds. Chang
+`command` in `docker-compose.yml` if you want to debug the errors.
 
 ## Contact
 
