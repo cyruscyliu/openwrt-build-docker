@@ -48,3 +48,7 @@ do_the_building(build_dir, compile_script)
 on collected firmware kernel data, AST & LLVM IR.  
 [docker-openwrt-buildroot](https://github.com/noonien/docker-openwrt-buildroot), a docker
 container for the OpenWRT buildroot.
+
+## Contact
+
+If you have any problems, please fire issues!
