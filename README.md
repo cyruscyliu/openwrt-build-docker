@@ -43,6 +43,10 @@ the corresponding build directory, for example,
 Please note that `./re_compile.sh` will clean the previous builds. Chang
 `command` in `docker-compose.yml` if you want to debug the errors.
 
+## Authors
+
+[Qiang Liu](https://github.com/cyruscyliu), and [Cen Zhang](https://github.com/occia)
+
 ## Contact
 
 If you have any problems, please fire issues!
